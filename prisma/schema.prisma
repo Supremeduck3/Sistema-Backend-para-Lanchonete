@@ -1,0 +1,18 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model Exemplo {
+    id       Int     @id @default(autoincrement())
+    nome     String?
+    telefone Int     @unique
+    email    String  @unique
+    estado   Boolean @default(true)
+    preco    Decimal @db.Decimal(10, 2)
+
+    @@map("exemplo")
+}
