@@ -7,17 +7,18 @@ datasource db {
 }
 
 model Cliente {
-    id         Int     @id @default(autoincrement())
+    id         Int      @id @default(autoincrement())
     nome       String
-    telefone   Int     @unique
-    email      String  @unique
-    cpf        Int     @unique
-    cep        Int     @unique
+    telefone   Int      @unique
+    email      String   @unique
+    cpf        Int      @unique
+    cep        Int      @unique
     logradouro String?
     bairro     String?
     localidade String?
     uf         String?
-    ativo      Boolean @default(true)
+    ativo      Boolean  @default(true)
+    pedidos    Pedido[]
 
     @@map("cliente")
 }
@@ -31,7 +32,7 @@ enum Categoria {
 
 model Produto {
     id         Int       @id @default(autoincrement())
-    nome       String?
+    nome       String
     descricao  String
     categoria  Categoria
     preco      Decimal   @db.Decimal(10, 2)
@@ -39,4 +40,32 @@ model Produto {
 
     @@map("produto")
 }
+
+enum StatusPedido {
+    ABERTO
+    PAGO
+    CANCELADO
+}
+
+model Pedido {
+    id        Int          @id @default(autoincrement())
+    clienteId Int
+    cliente   Cliente      @relation(fields: [clienteId], references: [id])
+    total     Decimal      @db.Decimal(10, 2)
+    status    StatusPedido
+    criadoEm  DateTime     @default(now())
+
+    @@map("pedido")
+}
+
+model ItemPedido {
+    id            Int     @id @default(autoincrement())
+    pedidoId      Int
+    produtoId     Int
+    quantidade    Int
+    precoUnitario Decimal @db.Decimal(10, 2)
+
+    @@map("itemPedido")
+}
+
 
