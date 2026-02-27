@@ -9,7 +9,7 @@ export default class ExemploModel {
     }
 
     async criar() {
-        return prisma.exemplo.create({
+        return prisma.lanchonete.create({
             data: {
                 nome: this.nome,
                 estado: this.estado,
@@ -19,14 +19,14 @@ export default class ExemploModel {
     }
 
     async atualizar() {
-        return prisma.exemplo.update({
+        return prisma.lanchonete.update({
             where: { id: this.id },
             data: { nome: this.nome, estado: this.estado, preco: this.preco },
         });
     }
 
     async deletar() {
-        return prisma.exemplo.delete({ where: { id: this.id } });
+        return prisma.lanchonete.delete({ where: { id: this.id } });
     }
 
     static async buscarTodos(filtros = {}) {
@@ -36,11 +36,11 @@ export default class ExemploModel {
         if (filtros.estado !== undefined) where.estado = filtros.estado === 'true';
         if (filtros.preco !== undefined) where.preco = parseFloat(filtros.preco);
 
-        return prisma.exemplo.findMany({ where });
+        return prisma.lanchonete.findMany({ where });
     }
 
     static async buscarPorId(id) {
-        const data = await prisma.exemplo.findUnique({ where: { id } });
+        const data = await prisma.lanchonete.findUnique({ where: { id } });
         if (!data) return null;
         return new ExemploModel(data);
     }
