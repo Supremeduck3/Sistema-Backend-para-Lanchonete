@@ -1,136 +1,182 @@
-import lanchoneteModel from '../models/lanchoneteModel.js';
+import pedidoModel from '../models/pedidoModel.js';
 
-class PedidoController {
-
-    static async criar(req, res) {
-        try {
-            const { clienteId } = req.body;
-
-            if (!clienteId) {
-                return res.status(400).json({ erro: "O campo 'clienteId' é obrigatório." });
-            }
-
-            if (isNaN(clienteId)) {
-                return res.status(400).json({ erro: 'ID inválido. Informe um número válido.' });
-            }
-
-            const pedido = await PedidoModel.criar({
-                clienteId,
-                status: 'ABERTO',
+export const criar = async (req, res) => {
+    try {
+        if (!req.body || Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                erro: 'Corpo da requisição vazio. Envie os dados!',
             });
-
-            return res.status(201).json(pedido);
-        } catch {
-            return res.status(500).json({ erro: 'Erro interno ao criar pedido.' });
         }
-    }
 
+        const { clienteId } = req.body;
 
-    static async buscarPorId(req, res) {
-        try {
-            const { id } = req.params;
-
-            if (isNaN(id)) {
-                return res.status(400).json({ erro: 'ID inválido. Informe um número válido.' });
-            }
-
-            const pedido = await PedidoModel.buscarPorId(Number(id));
-
-            if (!pedido) {
-                return res.status(404).json({ erro: 'Pedido não encontrado.' });
-            }
-
-            return res.status(200).json(pedido);
-        } catch {
-            return res.status(500).json({ erro: 'Erro interno ao buscar pedido.' });
-        }
-    }
-
-
-    static async listar(req, res) {
-        try {
-            const { status, clienteId } = req.query;
-
-            if (!status && !clienteId) {
-                return res.status(400).json({
-                    erro: 'Informe pelo menos um parâmetro para filtro.',
-                });
-            }
-
-            const pedidos = await PedidoModel.filtrar({
-                status,
-                clienteId,
+        if (!clienteId) {
+            return res.status(400).json({
+                erro: "O campo 'clienteId' é obrigatório.",
             });
-
-            if (pedidos.length === 0) {
-                return res.status(200).json({
-                    mensagem: 'Nenhum pedido encontrado.',
-                });
-            }
-
-            return res.status(200).json(pedidos);
-        } catch {
-            return res.status(500).json({ erro: 'Erro interno ao listar pedidos.' });
         }
+
+        if (isNaN(clienteId)) {
+            return res.status(400).json({
+                erro: 'ID inválido. Informe um número válido.',
+            });
+        }
+
+        const pedido = new pedidoModel({ clienteId });
+        const data = await pedido.criar();
+
+        return res.status(201).json({
+            message: 'Pedido criado com sucesso!',
+            data,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            erro: 'Erro interno ao criar pedido.',
+        });
     }
+};
 
 
-    static async pagar(req, res) {
+export const buscarTodos = async (req, res) => {
+    try {
+        const { status, clienteId } = req.query;
+
+        if (!status && !clienteId) {
+            return res.status(400).json({
+                erro: 'Informe pelo menos um parâmetro para filtro.',
+            });
+        }
+
+        const pedidos = await pedidoModel.buscarTodos(req.query);
+
+        if (!pedidos || pedidos.length === 0) {
+            return res.status(200).json({
+                mensagem: 'Nenhum pedido encontrado.',
+            });
+        }
+
+        return res.status(200).json(pedidos);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            erro: 'Erro interno ao buscar pedidos.',
+        });
+    }
+};
+
+
+export const buscarPorId = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (isNaN(id)) {
+            return res.status(400).json({
+                erro: 'ID inválido. Informe um número válido.',
+            });
+        }
+
+        const pedido = await pedidoModel.buscarPorId(Number(id));
+
+        if (!pedido) {
+            return res.status(404).json({
+                erro: 'Pedido não encontrado.',
+            });
+        }
+
+        return res.status(200).json({ data: pedido });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            erro: 'Erro interno ao buscar pedido.',
+        });
+    }
+};
+
+
+export const pagar = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (isNaN(id)) {
+            return res.status(400).json({
+                erro: 'ID inválido. Informe um número válido.',
+            });
+        }
+
+        const pedido = await pedidoModel.buscarPorId(Number(id));
+
+        if (!pedido) {
+            return res.status(404).json({
+                erro: 'Pedido não encontrado.',
+            });
+        }
+
+        if (pedido.status !== 'ABERTO') {
+            return res.status(400).json({
+                erro: 'Somente pedidos ABERTOS podem ser pagos.',
+            });
+        }
+
+        const pedidoModel = new pedidoModel({
+            id: pedido.id,
+            status: 'PAGO',
+        });
+
+        const data = await pedidoModel.atualizarStatus();
+
+        return res.status(200).json({
+            message: 'Pedido pago com sucesso!',
+            data,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            erro: 'Erro interno ao pagar pedido.',
+        });
+    }
+};
+
+
+export const cancelar = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (isNaN(id)) {
+            return res.status(400).json({
+                erro: 'ID inválido. Informe um número válido.',
+            });
+        }
+
+        const pedido = await pedidoModel.buscarPorId(Number(id));
+
+        if (!pedido) {
+            return res.status(404).json({
+                erro: 'Pedido não encontrado.',
+            });
+        }
+
         try {
-            const { id } = req.params;
-
-            if (isNaN(id)) {
-                return res.status(400).json({ erro: 'ID inválido. Informe um número válido.' });
-            }
-
-            const pedido = await PedidoModel.buscarPorId(Number(id));
-
-            if (!pedido) {
-                return res.status(404).json({ erro: 'Pedido não encontrado.' });
-            }
-
-            if (pedido.status !== 'ABERTO') {
-                return res.status(400).json({
-                    erro: 'Somente pedidos ABERTOS podem ser pagos.',
-                });
-            }
-
-            const pedidoPago = await PedidoModel.atualizarStatus(Number(id), 'PAGO');
-
-            return res.status(200).json(pedidoPago);
-        } catch {
-            return res.status(500).json({ erro: 'Erro interno ao pagar pedido.' });
+            pedidoModel.validarCancelamento(pedido);
+        } catch (erro) {
+            return res.status(400).json({ erro: erro.message });
         }
+
+        const pedidoModel = new pedidoModel({
+            id: pedido.id,
+            status: 'CANCELADO',
+        });
+
+        const data = await pedidoModel.atualizarStatus();
+
+        return res.status(200).json({
+            message: 'Pedido cancelado com sucesso!',
+            data,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            erro: 'Erro interno ao cancelar pedido.',
+        });
     }
-
-
-    static async cancelar(req, res) {
-        try {
-            const { id } = req.params;
-
-            if (isNaN(id)) {
-                return res.status(400).json({ erro: 'ID inválido. Informe um número válido.' });
-            }
-
-            const pedido = await PedidoModel.buscarPorId(Number(id));
-
-            if (!pedido) {
-                return res.status(404).json({ erro: 'Pedido não encontrado.' });
-            }
-
-            if (pedido.status !== 'ABERTO') {
-                return res.status(400).json({
-                    erro: 'Só é possível cancelar pedidos com status ABERTO.',
-                });
-            }
-
-            const pedidoCancelado = await PedidoModel.atualizarStatus(Number(id), 'CANCELADO');
-
-            return res.status(200).json(pedidoCancelado);
-        } catch {
-            return res.status(500).json({ erro: 'Erro interno ao cancelar pedido.' });
-        }
-    }
-}
-
-export default PedidoController;
+};
