@@ -9,10 +9,10 @@ datasource db {
 model Cliente {
     id         Int      @id @default(autoincrement())
     nome       String
-    telefone   Int      @unique
+    telefone   String     @unique
     email      String   @unique
-    cpf        Int      @unique
-    cep        Int      @unique
+    cpf        String     @unique
+    cep        String     @unique
     logradouro String?
     bairro     String?
     localidade String?
@@ -67,5 +67,3 @@ model ItemPedido {
 
     @@map("itemPedido")
 }
-
-
