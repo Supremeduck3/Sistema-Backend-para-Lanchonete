@@ -65,7 +65,6 @@ export default class ClienteModel {
         if (filtros.nome) where.nome = { contains: filtros.nome, mode: 'insensitive' };
         if (filtros.email) where.email = { contains: filtros.email, mode: 'insensitive' };
         if (filtros.estado !== undefined) where.estado = filtros.estado === 'true';
-        if(filtros.telefone !== undefined) where.telefone = parseInt(filtros.telefone)
 
         return prisma.cliente.findMany({ where });
     }
