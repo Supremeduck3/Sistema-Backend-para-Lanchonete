@@ -1,4 +1,4 @@
-import LanchoneteModel from '../models/lanchoneteModel.js';
+import itemPedidoModel from '../models/itemPedidosModel.js';
 
 export const criar = async (req, res) => {
     try {
@@ -10,12 +10,12 @@ export const criar = async (req, res) => {
 
         if (!pedidoId || !produtoId || !quantidade || !precoUnitario ) {
             return res.status(400).json({
-                error: 'Os campos nome, telefone, email, cpf e cep são obrigatórios e não podem estar vazios!',
+                error: 'Os campos pedidoId, produtoId, quantidade e precoUnitario são obrigatórios e não podem estar vazios!',
             });
         }
 
-        const lanchonete = new LanchoneteModel({ nome, email, telefone, cpf, cep });
-        const data = await lanchonete.criar();
+        const itemPedidos = new itemPedidoModel({ pedidoId, produtoId, quantidade, precoUnitario});
+        const data = await itemPedidos.criar();
 
         return res.status(201).json({ message: 'Registro criado com sucesso!', data });
     } catch (error) {
@@ -26,7 +26,7 @@ export const criar = async (req, res) => {
 
 export const buscarTodos = async (req, res) => {
     try {
-        const registros = await LanchoneteModel.buscarTodos(req.query);
+        const registros = await itemPedidosModel.buscarTodos(req.query);
 
         if (!registros || registros.length === 0) {
             return res.status(200).json({ message: 'Nenhum registro encontrado.' });
@@ -47,13 +47,13 @@ export const buscarPorId = async (req, res) => {
             return res.status(400).json({ error: 'O ID enviado não é um número válido.' });
         }
 
-        const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
+        const itemPedido = await itemPedidosModel.buscarPorId(parseInt(id));
 
-        if (!lanchonete) {
+        if (!itemPedido) {
             return res.status(404).json({ error: 'Registro não encontrado.' });
         }
 
-        res.json({ data: lanchonete });
+        res.json({ data: itemPedido });
     } catch (error) {
         console.error('Erro ao buscar:', error);
         res.status(500).json({ error: 'Erro ao buscar registro.' });
@@ -70,26 +70,20 @@ export const atualizar = async (req, res) => {
             return res.status(400).json({ error: 'Corpo da requisição vazio. Envie os dados!' });
         }
 
-        const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
+        const itemPedido = await itemPedidoModel.buscarPorId(parseInt(id));
 
-        if (!lanchonete) {
+        if (!itemPedido) {
             return res.status(404).json({ error: 'Registro não encontrado para atualizar.' });
         }
 
-        if (req.body.nome !== undefined) lanchonete.nome = req.body.nome;
-        if (req.body.telefone !== undefined) lanchonete.telefone = req.body.telefone;
-        if (req.body.email !== undefined) lanchonete.email = parseFloat(req.body.email);
-        if (req.body.cpf !== undefined) lanchonete.cpf = parseFloat(req.body.cpf);
-        if (req.body.cep !== undefined) lanchonete.cep = parseFloat(req.body.cep);
-        if (req.body.logradouro !== undefined) lanchonete.logradouro = parseFloat(req.body.logradouro);
-        if (req.body.bairro !== undefined) lanchonete.bairro = parseFloat(req.body.bairro);
-        if (req.body.localidade !== undefined) lanchonete.localidade = parseFloat(req.body.localidade);
-        if (req.body.uf !== undefined) lanchonete.uf = parseFloat(req.body.uf);
-        if (req.body.ativo !== undefined) lanchonete.ativo = parseFloat(req.body.ativo);
+        if (req.body.pedidoId !== undefined) itemPedido.pedidoId = req.body.pedidoId;
+        if (req.body.produtoId !== undefined) itemPedido.produtoId = req.body.produtoId;
+        if (req.body.quantidade !== undefined) itemPedido.quantidade = parseFloat(req.body.quantidade);
+        if (req.body.precoUnitario !== undefined) itemPedido.precoUnitario = parseFloat(req.body.precoUnitario);
 
-        const data = await lanchonete.atualizar();
+        const data = await itemPedido.atualizar();
 
-        res.json({ message: `O registro "${data.nome}" foi atualizado com sucesso!`, data });
+        res.json({ message: `O registro "${data.pedidoId}" foi atualizado com sucesso!`, data });
     } catch (error) {
         console.error('Erro ao atualizar:', error);
         res.status(500).json({ error: 'Erro ao atualizar registro.' });
@@ -102,15 +96,15 @@ export const deletar = async (req, res) => {
 
         if (isNaN(id)) return res.status(400).json({ error: 'ID inválido.' });
 
-        const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
+        const itemPedido = await itemPedidoModel.buscarPorId(parseInt(id));
 
-        if (!lanchonete) {
+        if (!itemPedido) {
             return res.status(404).json({ error: 'Registro não encontrado para deletar.' });
         }
 
-        await lanchonete.deletar();
+        await itemPedido.deletar();
 
-        res.json({ message: `O registro "${lanchonete.nome}" foi deletado com sucesso!`, deletado: lanchonete });
+        res.json({ message: `O registro "${itemPedido.pedidoId}" foi deletado com sucesso!`, deletado: itemPedido });
     } catch (error) {
         console.error('Erro ao deletar:', error);
         res.status(500).json({ error: 'Erro ao deletar registro.' });

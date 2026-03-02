@@ -1,119 +1,182 @@
-import LanchoneteModel from '../models/lanchoneteModel.js';
+import pedidoModel from '../models/pedidoModel.js';
 
 export const criar = async (req, res) => {
     try {
         if (!req.body || Object.keys(req.body).length === 0) {
-            return res.status(400).json({ error: 'Corpo da requisição vazio. Envie os dados!' });
-        }
-
-        const { nome, telefone, email, cpf, cep } =
-            req.body;
-
-        if (!nome || !telefone || !email || !cpf || !cep) {
             return res.status(400).json({
-                error: 'Os campos nome, telefone, email, cpf e cep são obrigatórios e não podem estar vazios!',
+                erro: 'Corpo da requisição vazio. Envie os dados!',
             });
         }
 
-        const lanchonete = new LanchoneteModel({ nome, email, telefone, cpf, cep });
-        const data = await lanchonete.criar();
+        const { clienteId } = req.body;
 
-        return res.status(201).json({ message: 'Registro criado com sucesso!', data });
+        if (!clienteId) {
+            return res.status(400).json({
+                erro: "O campo 'clienteId' é obrigatório.",
+            });
+        }
+
+        if (isNaN(clienteId)) {
+            return res.status(400).json({
+                erro: 'ID inválido. Informe um número válido.',
+            });
+        }
+
+        const pedido = new pedidoModel({ clienteId });
+        const data = await pedido.criar();
+
+        return res.status(201).json({
+            message: 'Pedido criado com sucesso!',
+            data,
+        });
     } catch (error) {
-        console.error('Erro ao criar:', error);
-        return res.status(500).json({ error: 'Erro interno ao salvar o registro.' });
+        console.error(error);
+        return res.status(500).json({
+            erro: 'Erro interno ao criar pedido.',
+        });
     }
 };
+
 
 export const buscarTodos = async (req, res) => {
     try {
-        const registros = await LanchoneteModel.buscarTodos(req.query);
+        const { status, clienteId } = req.query;
 
-        if (!registros || registros.length === 0) {
-            return res.status(200).json({ message: 'Nenhum registro encontrado.' });
+        if (!status && !clienteId) {
+            return res.status(400).json({
+                erro: 'Informe pelo menos um parâmetro para filtro.',
+            });
         }
 
-        res.json(registros);
+        const pedidos = await pedidoModel.buscarTodos(req.query);
+
+        if (!pedidos || pedidos.length === 0) {
+            return res.status(200).json({
+                mensagem: 'Nenhum pedido encontrado.',
+            });
+        }
+
+        return res.status(200).json(pedidos);
     } catch (error) {
-        console.error('Erro ao buscar:', error);
-        res.status(500).json({ error: 'Erro ao buscar registros.' });
+        console.error(error);
+        return res.status(500).json({
+            erro: 'Erro interno ao buscar pedidos.',
+        });
     }
 };
+
 
 export const buscarPorId = async (req, res) => {
     try {
         const { id } = req.params;
 
         if (isNaN(id)) {
-            return res.status(400).json({ error: 'O ID enviado não é um número válido.' });
+            return res.status(400).json({
+                erro: 'ID inválido. Informe um número válido.',
+            });
         }
 
-        const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
+        const pedido = await pedidoModel.buscarPorId(Number(id));
 
-        if (!lanchonete) {
-            return res.status(404).json({ error: 'Registro não encontrado.' });
+        if (!pedido) {
+            return res.status(404).json({
+                erro: 'Pedido não encontrado.',
+            });
         }
 
-        res.json({ data: lanchonete });
+        return res.status(200).json({ data: pedido });
     } catch (error) {
-        console.error('Erro ao buscar:', error);
-        res.status(500).json({ error: 'Erro ao buscar registro.' });
+        console.error(error);
+        return res.status(500).json({
+            erro: 'Erro interno ao buscar pedido.',
+        });
     }
 };
 
-export const atualizar = async (req, res) => {
+
+export const pagar = async (req, res) => {
     try {
         const { id } = req.params;
 
-        if (isNaN(id)) return res.status(400).json({ error: 'ID inválido.' });
-
-        if (!req.body) {
-            return res.status(400).json({ error: 'Corpo da requisição vazio. Envie os dados!' });
+        if (isNaN(id)) {
+            return res.status(400).json({
+                erro: 'ID inválido. Informe um número válido.',
+            });
         }
 
-        const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
+        const pedido = await pedidoModel.buscarPorId(Number(id));
 
-        if (!lanchonete) {
-            return res.status(404).json({ error: 'Registro não encontrado para atualizar.' });
+        if (!pedido) {
+            return res.status(404).json({
+                erro: 'Pedido não encontrado.',
+            });
         }
 
-        if (req.body.nome !== undefined) lanchonete.nome = req.body.nome;
-        if (req.body.telefone !== undefined) lanchonete.telefone = req.body.telefone;
-        if (req.body.email !== undefined) lanchonete.email = parseFloat(req.body.email);
-        if (req.body.cpf !== undefined) lanchonete.cpf = parseFloat(req.body.cpf);
-        if (req.body.cep !== undefined) lanchonete.cep = parseFloat(req.body.cep);
-        if (req.body.logradouro !== undefined) lanchonete.logradouro = parseFloat(req.body.logradouro);
-        if (req.body.bairro !== undefined) lanchonete.bairro = parseFloat(req.body.bairro);
-        if (req.body.localidade !== undefined) lanchonete.localidade = parseFloat(req.body.localidade);
-        if (req.body.uf !== undefined) lanchonete.uf = parseFloat(req.body.uf);
-        if (req.body.ativo !== undefined) lanchonete.ativo = parseFloat(req.body.ativo);
+        if (pedido.status !== 'ABERTO') {
+            return res.status(400).json({
+                erro: 'Somente pedidos ABERTOS podem ser pagos.',
+            });
+        }
 
-        const data = await lanchonete.atualizar();
+        const pedidoModel = new pedidoModel({
+            id: pedido.id,
+            status: 'PAGO',
+        });
 
-        res.json({ message: `O registro "${data.nome}" foi atualizado com sucesso!`, data });
+        const data = await pedidoModel.atualizarStatus();
+
+        return res.status(200).json({
+            message: 'Pedido pago com sucesso!',
+            data,
+        });
     } catch (error) {
-        console.error('Erro ao atualizar:', error);
-        res.status(500).json({ error: 'Erro ao atualizar registro.' });
+        console.error(error);
+        return res.status(500).json({
+            erro: 'Erro interno ao pagar pedido.',
+        });
     }
 };
 
-export const deletar = async (req, res) => {
+
+export const cancelar = async (req, res) => {
     try {
         const { id } = req.params;
 
-        if (isNaN(id)) return res.status(400).json({ error: 'ID inválido.' });
-
-        const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
-
-        if (!lanchonete) {
-            return res.status(404).json({ error: 'Registro não encontrado para deletar.' });
+        if (isNaN(id)) {
+            return res.status(400).json({
+                erro: 'ID inválido. Informe um número válido.',
+            });
         }
 
-        await lanchonete.deletar();
+        const pedido = await pedidoModel.buscarPorId(Number(id));
 
-        res.json({ message: `O registro "${lanchonete.nome}" foi deletado com sucesso!`, deletado: lanchonete });
+        if (!pedido) {
+            return res.status(404).json({
+                erro: 'Pedido não encontrado.',
+            });
+        }
+
+        try {
+            pedidoModel.validarCancelamento(pedido);
+        } catch (erro) {
+            return res.status(400).json({ erro: erro.message });
+        }
+
+        const pedidoModel = new pedidoModel({
+            id: pedido.id,
+            status: 'CANCELADO',
+        });
+
+        const data = await pedidoModel.atualizarStatus();
+
+        return res.status(200).json({
+            message: 'Pedido cancelado com sucesso!',
+            data,
+        });
     } catch (error) {
-        console.error('Erro ao deletar:', error);
-        res.status(500).json({ error: 'Erro ao deletar registro.' });
+        console.error(error);
+        return res.status(500).json({
+            erro: 'Erro interno ao cancelar pedido.',
+        });
     }
 };
