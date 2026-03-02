@@ -16,7 +16,7 @@ async function main() {
 
     console.log('📦 Inserindo novos registros...');
 
-    await prisma.exemplo.createMany({
+    await prisma.cliente.createMany({
         data: [
             {
                 id: 1,
