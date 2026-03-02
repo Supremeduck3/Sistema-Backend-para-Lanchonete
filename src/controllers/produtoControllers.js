@@ -18,25 +18,25 @@ export const criar = async (req, res) => {
         const lanchonete = new LanchoneteModel({ nome, categoria, descricao, preco,  });
         const data = await lanchonete.criar();
 
-        return res.status(201).json({ message: 'Registro criado com sucesso!', data });
+        return res.status(201).json({ message: 'produto criado com sucesso!', data });
     } catch (error) {
         console.error('Erro ao criar:', error);
-        return res.status(500).json({ error: 'Erro interno ao salvar o registro.' });
+        return res.status(500).json({ error: 'Erro interno ao salvar o produto.' });
     }
 };
 
 export const buscarTodos = async (req, res) => {
     try {
-        const registros = await LanchoneteModel.buscarTodos(req.query);
+        const produtos = await LanchoneteModel.buscarTodos(req.query);
 
-        if (!registros || registros.length === 0) {
-            return res.status(200).json({ message: 'Nenhum registro encontrado.' });
+        if (!produtos || produtos.length === 0) {
+            return res.status(200).json({ message: 'Nenhum produto encontrado.' });
         }
 
-        res.json(registros);
+        res.json(produtos);
     } catch (error) {
         console.error('Erro ao buscar:', error);
-        res.status(500).json({ error: 'Erro ao buscar registros.' });
+        res.status(500).json({ error: 'Erro ao buscar produtos.' });
     }
 };
 
@@ -51,13 +51,13 @@ export const buscarPorId = async (req, res) => {
         const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
 
         if (!lanchonete) {
-            return res.status(404).json({ error: 'Registro não encontrado.' });
+            return res.status(404).json({ error: 'produto não encontrado.' });
         }
 
         res.json({ data: lanchonete });
     } catch (error) {
         console.error('Erro ao buscar:', error);
-        res.status(500).json({ error: 'Erro ao buscar registro.' });
+        res.status(500).json({ error: 'Erro ao buscar produto.' });
     }
 };
 
@@ -74,7 +74,7 @@ export const atualizar = async (req, res) => {
         const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
 
         if (!lanchonete) {
-            return res.status(404).json({ error: 'Registro não encontrado para atualizar.' });
+            return res.status(404).json({ error: 'produto não encontrado para atualizar.' });
         }
 
         if (req.body.nome !== undefined) lanchonete.nome = req.body.nome;
@@ -84,10 +84,10 @@ export const atualizar = async (req, res) => {
 
         const data = await lanchonete.atualizar();
 
-        res.json({ message: `O registro "${data.nome}" foi atualizado com sucesso!`, data });
+        res.json({ message: `O produto "${data.nome}" foi atualizado com sucesso!`, data });
     } catch (error) {
         console.error('Erro ao atualizar:', error);
-        res.status(500).json({ error: 'Erro ao atualizar registro.' });
+        res.status(500).json({ error: 'Erro ao atualizar produto.' });
     }
 };
 
@@ -100,14 +100,14 @@ export const deletar = async (req, res) => {
         const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
 
         if (!lanchonete) {
-            return res.status(404).json({ error: 'Registro não encontrado para deletar.' });
+            return res.status(404).json({ error: 'produto não encontrado para deletar.' });
         }
 
         await lanchonete.deletar();
 
-        res.json({ message: `O registro "${lanchonete.nome}" foi deletado com sucesso!`, deletado: lanchonete });
+        res.json({ message: `O produto "${lanchonete.nome}" foi deletado com sucesso!`, deletado: lanchonete });
     } catch (error) {
         console.error('Erro ao deletar:', error);
-        res.status(500).json({ error: 'Erro ao deletar registro.' });
+        res.status(500).json({ error: 'Erro ao deletar produto.' });
     }
 };
