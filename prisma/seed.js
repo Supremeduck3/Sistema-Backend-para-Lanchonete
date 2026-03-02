@@ -18,8 +18,45 @@ async function main() {
 
     await prisma.exemplo.createMany({
         data: [
-            { nome: 'Notebook', preco: 3500.00 },
-            { nome: 'Monitor', preco: 1800.00 },
+            {
+                id: 1,
+                nome: 'Lucas Oliveira',
+                telefone: '11988887777',
+                email: 'lucas.oliveira@email.com',
+                cpf: '123.456.789-01',
+                cep: '01310100',
+                logradouro: null,
+                bairro: null,
+                localidade: null,
+                uf: null,
+                ativo: true,
+            },
+            {
+                id: 2,
+                nome: 'Mariana Souza',
+                telefone: '21977776666',
+                email: 'mari.souza@provedor.net',
+                cpf: '234.567.890-12',
+                cep: '20040002',
+                logradouro: null,
+                bairro: null,
+                localidade: null,
+                uf: null,
+                ativo: true,
+            },
+            {
+                id: 3,
+                nome: 'Ricardo Mendes',
+                telefone: '31966665555',
+                email: 'mendes.ricardo@empresa.com.br',
+                cpf: '345.678.901-23',
+                cep: '30140010',
+                logradouro: null,
+                bairro: null,
+                localidade: null,
+                uf: null,
+                ativo: true,
+            },
         ],
     });
 
