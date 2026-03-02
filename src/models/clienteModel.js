@@ -28,7 +28,7 @@ export default class clienteModel {
                 bairro: this.bairro,
                 localidade: this.localidade,
                 uf: this.uf,
-                ativo: this.ativo
+                ativo: this.ativo,
             },
         });
     }
@@ -46,7 +46,7 @@ export default class clienteModel {
                 bairro: this.bairro,
                 localidade: this.localidade,
                 uf: this.uf,
-                ativo: this.ativo
+                ativo: this.ativo,
             },
         });
     }
