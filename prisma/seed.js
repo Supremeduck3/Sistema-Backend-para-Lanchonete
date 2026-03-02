@@ -10,9 +10,13 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
     console.log('🌱 Resetando tabela exemplo...');
+
+    // Remove todos os registros
+    // await prisma.exemplo.deleteMany();
+
     console.log('📦 Inserindo novos registros...');
 
-    await prisma.cliente.createMany({
+    await prisma.exemplo.createMany({
         data: [
             {
                 id: 1,
@@ -56,84 +60,6 @@ async function main() {
         ],
     });
 
-    await prisma.produto.createMany({
-        data: [
-            {
-                id: 1,
-                nome: 'X-Burguer',
-                descricao: 'Delicioso lanche com carne, queijo e molho especial',
-                categoria: 'LANCHE',
-                preco: 15.99,
-                disponivel: true,
-            },
-            {
-                id: 2,
-                nome: 'Coca-Cola',
-                descricao: 'Refrigerante de cola 350ml',
-                categoria: 'BEBIDA',
-                preco: 4.5,
-                disponivel: true,
-            },
-            {
-                id: 3,
-                nome: 'Pudim de Leite',
-                descricao: 'Sobremesa cremosa de leite condensado',
-                categoria: 'SOBREMESA',
-                preco: 8.0,
-                disponivel: true,
-            },
-        ],
-    });
-    await prisma.pedido.createMany({
-        data: [
-            {
-                id: 1,
-                clienteId: 1,
-                total: 20.99,
-                status: 'ABERTO',
-                criadoEm: new Date(),
-            },
-            {
-                id: 2,
-                clienteId: 2,
-                total: 23.5,
-                status: 'PAGO',
-                criadoEm: new Date(),
-            },
-            {
-                id: 3,
-                clienteId: 3,
-                total: 12.0,
-                status: 'CANCELADO',
-                criadoEm: new Date(),
-            },
-        ],
-    });
-    await prisma.itemPedido.createMany({
-        data: [
-            {
-                id: 1,
-                pedidoId: 1,
-                produtoId: 1,
-                quantidade: 1,
-                precoUnitario: 15.99,
-            },
-            {
-                id: 2,
-                pedidoId: 2,
-                produtoId: 2,
-                quantidade: 2,
-                precoUnitario: 4.5,
-            },
-            {
-                id: 3,
-                pedidoId: 3,
-                produtoId: 3,
-                quantidade: 1,
-                precoUnitario: 8.0,
-            },
-        ],
-    });
     console.log('✅ Seed concluído!');
 }
 
