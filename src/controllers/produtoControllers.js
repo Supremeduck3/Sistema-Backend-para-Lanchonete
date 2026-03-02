@@ -1,4 +1,4 @@
-import LanchoneteModel from '../models/lanchoneteModel.js';
+import ProdutoModel from '../models/produtoModel.js';
 
 export const criar = async (req, res) => {
     try {
@@ -6,28 +6,39 @@ export const criar = async (req, res) => {
             return res.status(400).json({ error: 'Corpo da requisição vazio. Envie os dados!' });
         }
 
-        const { nome, descricao, categoria, preco,  } =
-            req.body;
+        const { nome, descricao, categoria, preco, disponivel } = req.body;
 
-        if (!nome || !descricao || !categoria || !preco) {
+        if (!nome || !descricao || !categoria || !preco || disponivel === undefined) {
             return res.status(400).json({
-                error: 'Os campos nome, descricao, categoria, preco e  são obrigatórios e não podem estar vazios!',
+                error: 'Os campos nome, descricao, categoria, preco e disponivel são obrigatórios e não podem estar vazios!',
+            });
+        }
+        // Regras de Negocio
+        if (preco <= 0) {
+            return res.status(400).json({
+                error: 'O campo "preco" deve ser um número maior que zero.',
             });
         }
 
-        const lanchonete = new LanchoneteModel({ nome, categoria, descricao, preco,  });
-        const data = await lanchonete.criar();
+        if (disponivel === false) {
+            return res.status(400).json({
+                error: 'O campo "disponivel" não pode ser false ao criar um produto.',
+            });
+        }
 
-        return res.status(201).json({ message: 'produto criado com sucesso!', data });
+        const produto = new ProdutoModel({ nome, categoria, descricao, preco, disponivel });
+        const data = await produto.criar();
+
+        return res.status(201).json({ message: 'Registro criado com sucesso!', data });
     } catch (error) {
         console.error('Erro ao criar:', error);
-        return res.status(500).json({ error: 'Erro interno ao salvar o produto.' });
+        return res.status(500).json({ error: 'Erro interno ao salvar o registro.' });
     }
 };
 
 export const buscarTodos = async (req, res) => {
     try {
-        const produtos = await LanchoneteModel.buscarTodos(req.query);
+        const produtos = await ProdutoModel.buscarTodos(req.query);
 
         if (!produtos || produtos.length === 0) {
             return res.status(200).json({ message: 'Nenhum produto encontrado.' });
@@ -48,16 +59,16 @@ export const buscarPorId = async (req, res) => {
             return res.status(400).json({ error: 'O ID enviado não é um número válido.' });
         }
 
-        const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
+        const produto = await ProdutoModel.buscarPorId(parseInt(id));
 
-        if (!lanchonete) {
-            return res.status(404).json({ error: 'produto não encontrado.' });
+        if (!produto) {
+            return res.status(404).json({ error: 'Registro não encontrado.' });
         }
 
-        res.json({ data: lanchonete });
+        res.json({ data: produto });
     } catch (error) {
         console.error('Erro ao buscar:', error);
-        res.status(500).json({ error: 'Erro ao buscar produto.' });
+        res.status(500).json({ error: 'Erro ao buscar registro.' });
     }
 };
 
@@ -71,23 +82,24 @@ export const atualizar = async (req, res) => {
             return res.status(400).json({ error: 'Corpo da requisição vazio. Envie os dados!' });
         }
 
-        const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
+        const produto = await ProdutoModel.buscarPorId(parseInt(id));
 
-        if (!lanchonete) {
-            return res.status(404).json({ error: 'produto não encontrado para atualizar.' });
+        if (!produto) {
+            return res.status(404).json({ error: 'Registro não encontrado para atualizar.' });
         }
 
-        if (req.body.nome !== undefined) lanchonete.nome = req.body.nome;
-        if (req.body.descricao !== undefined) lanchonete.descricao = req.body.descricao;
-        if (req.body.categoria !== undefined) lanchonete.categoria = parseFloat(req.body.categoria);
-        if (req.body.preco !== undefined) lanchonete.preco = parseFloat(req.body.preco);
+        if (req.body.nome !== undefined) produto.nome = req.body.nome;
+        if (req.body.descricao !== undefined) produto.descricao = req.body.descricao;
+        if (req.body.categoria !== undefined) produto.categoria = req.body.categoria;
+        if (req.body.preco !== undefined) produto.preco = parseFloat(req.body.preco);
+        if (req.body.disponivel !== undefined) produto.disponivel = req.body.disponivel;
 
-        const data = await lanchonete.atualizar();
+        const data = await produto.atualizar();
 
-        res.json({ message: `O produto "${data.nome}" foi atualizado com sucesso!`, data });
+        res.json({ message: `O registro "${data.nome}" foi atualizado com sucesso!`, data });
     } catch (error) {
         console.error('Erro ao atualizar:', error);
-        res.status(500).json({ error: 'Erro ao atualizar produto.' });
+        res.status(500).json({ error: 'Erro ao atualizar registro.' });
     }
 };
 
@@ -97,17 +109,20 @@ export const deletar = async (req, res) => {
 
         if (isNaN(id)) return res.status(400).json({ error: 'ID inválido.' });
 
-        const lanchonete = await LanchoneteModel.buscarPorId(parseInt(id));
+        const produto = await ProdutoModel.buscarPorId(parseInt(id));
 
-        if (!lanchonete) {
-            return res.status(404).json({ error: 'produto não encontrado para deletar.' });
+        if (!produto) {
+            return res.status(404).json({ error: 'Registro não encontrado para deletar.' });
         }
 
-        await lanchonete.deletar();
+        await produto.deletar();
 
-        res.json({ message: `O produto "${lanchonete.nome}" foi deletado com sucesso!`, deletado: lanchonete });
+        res.json({
+            message: `O registro "${produto.nome}" foi deletado com sucesso!`,
+            deletado: produto,
+        });
     } catch (error) {
         console.error('Erro ao deletar:', error);
-        res.status(500).json({ error: 'Erro ao deletar produto.' });
+        res.status(500).json({ error: 'Erro ao deletar registro.' });
     }
 };
