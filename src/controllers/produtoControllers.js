@@ -6,16 +6,16 @@ export const criar = async (req, res) => {
             return res.status(400).json({ error: 'Corpo da requisição vazio. Envie os dados!' });
         }
 
-        const { nome, telefone, email, cpf, cep } =
+        const { nome, descricao, categoria, preco,  } =
             req.body;
 
-        if (!nome || !telefone || !email || !cpf || !cep) {
+        if (!nome || !descricao || !categoria || !preco) {
             return res.status(400).json({
-                error: 'Os campos nome, telefone, email, cpf e cep são obrigatórios e não podem estar vazios!',
+                error: 'Os campos nome, descricao, categoria, preco e  são obrigatórios e não podem estar vazios!',
             });
         }
 
-        const lanchonete = new LanchoneteModel({ nome, email, telefone, cpf, cep });
+        const lanchonete = new LanchoneteModel({ nome, categoria, descricao, preco,  });
         const data = await lanchonete.criar();
 
         return res.status(201).json({ message: 'Registro criado com sucesso!', data });
@@ -78,15 +78,9 @@ export const atualizar = async (req, res) => {
         }
 
         if (req.body.nome !== undefined) lanchonete.nome = req.body.nome;
-        if (req.body.telefone !== undefined) lanchonete.telefone = req.body.telefone;
-        if (req.body.email !== undefined) lanchonete.email = parseFloat(req.body.email);
-        if (req.body.cpf !== undefined) lanchonete.cpf = parseFloat(req.body.cpf);
-        if (req.body.cep !== undefined) lanchonete.cep = parseFloat(req.body.cep);
-        if (req.body.logradouro !== undefined) lanchonete.logradouro = parseFloat(req.body.logradouro);
-        if (req.body.bairro !== undefined) lanchonete.bairro = parseFloat(req.body.bairro);
-        if (req.body.localidade !== undefined) lanchonete.localidade = parseFloat(req.body.localidade);
-        if (req.body.uf !== undefined) lanchonete.uf = parseFloat(req.body.uf);
-        if (req.body.ativo !== undefined) lanchonete.ativo = parseFloat(req.body.ativo);
+        if (req.body.descricao !== undefined) lanchonete.descricao = req.body.descricao;
+        if (req.body.categoria !== undefined) lanchonete.categoria = parseFloat(req.body.categoria);
+        if (req.body.preco !== undefined) lanchonete.preco = parseFloat(req.body.preco);
 
         const data = await lanchonete.atualizar();
 
