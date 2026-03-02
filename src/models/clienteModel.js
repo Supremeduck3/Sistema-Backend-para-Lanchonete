@@ -1,30 +1,19 @@
 import prisma from '../utils/prismaClient.js';
 
 export default class clienteModel {
-    constructor({
-        id,
-        nome,
-        telefone,
-        email,
-        cpf,
-        cep,
-        logradouro = null,
-        bairro = null,
-        localidade = null,
-        uf = null,
-        ativo = true,
-    } = {}) {
-        ((this.id = id),
-            (this.nome = nome),
-            (this.telefone = telefone),
-            (this.email = email),
-            (this.cpf = cpf),
-            (this.cep = cep),
-            (this.logradouro = logradouro),
-            (this.bairro = bairro),
-            (this.localidade = localidade),
-            (this.uf = uf),
-            (this.ativo = ativo));
+    constructor({ id = null, nome, telefone, email = null, cpf = null, cep = null, logradouro = null, bairro = null, localidade = null,uf = null, ativo = true
+     } = {}) {
+        this.id = id,
+        this.nome = nome,
+            this.telefone = telefone,
+            this.email = email,
+            this.cpf = cpf,
+            this.cep = cep,
+            this.logradouro = logradouro,
+            this.bairro = bairro,
+            this.localidade = localidade,
+            this.uf = uf,
+            this.ativo =  ativo
     }
 
     async criar() {

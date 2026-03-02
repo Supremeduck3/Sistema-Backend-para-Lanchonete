@@ -15,8 +15,8 @@ router.delete('/cliente/:id', controller.deletar);
 router.post('/pedidos', controller1.criar);
 router.get('/pedidos', controller1.buscarTodos);
 router.get('/pedidos/:id', controller1.buscarPorId);
-router.put('/pedidos/:id', controller1.atualizar);
-router.delete('/pedidos/:id', controller1.deletar);
+router.put('/pedidos/:id', controller1.pagar);
+router.delete('/pedidos/:id', controller1.cancelar);
 
 router.post('/produtos', controller2.criar);
 router.get('/produtos', controller2.buscarTodos);
