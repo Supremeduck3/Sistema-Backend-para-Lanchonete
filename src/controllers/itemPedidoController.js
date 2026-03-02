@@ -6,10 +6,9 @@ export const criar = async (req, res) => {
             return res.status(400).json({ error: 'Corpo da requisição vazio. Envie os dados!' });
         }
 
-        const { nome, telefone, email, cpf, cep } =
-            req.body;
+        const { pedidoId, produtoId, quantidade, precoUnitario,  } = req.body;
 
-        if (!nome || !telefone || !email || !cpf || !cep) {
+        if (!pedidoId || !produtoId || !quantidade || !precoUnitario ) {
             return res.status(400).json({
                 error: 'Os campos nome, telefone, email, cpf e cep são obrigatórios e não podem estar vazios!',
             });
