@@ -1,7 +1,7 @@
 {
   "name": "Sistema-Backend-para-Lanchonete",
   "version": "1.0.0",
-  "description": "sistema de lanchonete",
+  "description": "sistema CRUD lanchonete",
   "main": "server.js",
   "type": "module",
   "private": true,

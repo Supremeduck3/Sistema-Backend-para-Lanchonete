@@ -2,11 +2,11 @@ import prisma from '../utils/prismaClient.js';
 
 export default class itemPedidoModel {
     constructor({
-        id = null,
-        pedidoId = null,
-        produtoId = null,
-        quantidade = null,
-        precoUnitario = null,
+        id,
+        pedidoId,
+        produtoId,
+        quantidade,
+        precoUnitario,
     } = {}) {
         ((this.id = id),
             (this.pedidoId = pedidoId),
