@@ -1,8 +1,12 @@
+
 async function buscarEndereco(cep) {
     const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
     const dados = await resposta.json();
 
-    console.log(dados);
-}
+    if (dados.erro === 'true') {
+        return res.status(400).json({ error: 'Verifique novamente o cep (Bad request)' });
+    }
 
-buscarEndereco(66073426);
+    console.log(dados.logradouro);
+}
+buscarEndereco(35900260);
