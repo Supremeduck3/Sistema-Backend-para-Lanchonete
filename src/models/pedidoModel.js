@@ -47,7 +47,7 @@ class PedidoModel {
         const pedidos = await prisma.pedido.findMany({
             where,
             include: {
-                itens: true,
+                cliente: true,
             },
         });
 
