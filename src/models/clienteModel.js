@@ -1,6 +1,11 @@
 import prisma from '../utils/prismaClient.js';
+ async function buscarEndereco(cep) {
+    const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const dados = await resposta.json();
 
-export default class clienteModel {
+    return cep
+ }
+export default class ClienteModel {
     constructor({
         id = null,
         nome,
@@ -27,6 +32,7 @@ export default class clienteModel {
         this.ativo = ativo;
     }
 
+
     validarNome() {
         if (this.nome || this.nome.trim().length === 0) {
             return { erro: 'O nome é obrigatório.' };
@@ -49,8 +55,8 @@ export default class clienteModel {
     }
 
     validarCEP() {
-        if (!this.cep || this.cep.length !== 9 || isNaN(this.cep))
-            return { erro: 'CEP deve conter exatamente 9 dígitos numéricos.' };
+        if (!this.cep || this.cep.length !== 8 || isNaN(this.cep))
+            return { erro: 'CEP deve conter exatamente 8 dígitos numéricos.' };
 
         return null;
     }
@@ -71,18 +77,6 @@ export default class clienteModel {
         }
 
         return null;
-    }
-
-    validarTelefone() {
-        if (!this.telefone) {
-            return {erro: 'Telefone é obrigatório'}
-        }
-        if (isNaN(this.telefone)) {
-            return {erro: 'O campo telefone deve ser apenas números'}
-        }
-        if (this.telefone.length < 10 || this.telefone.length > 11) {
-            return {erro: 'O telefone deve ter entre 10 a 11 números'}
-        }
     }
 
     async criar() {
