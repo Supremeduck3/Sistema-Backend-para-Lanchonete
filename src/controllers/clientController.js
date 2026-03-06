@@ -15,7 +15,7 @@ export const criar = async (req, res) => {
             });
         }
 
-        const cepTest = cep 
+        const cepTest = cep
 
         const cliente = new clienteModel({ nome, email, telefone, cpf, cep });
         const data = await cliente.criar();
@@ -32,7 +32,7 @@ export const buscarTodos = async (req, res) => {
         const registros = await clienteModel.buscarTodos(req.query);
 
         if (!registros || registros.length === 0) {
-            return res.status(200).json({ message: 'Nenhum registro encontrado.' });
+            return res.status(400).json({ error: 'Nenhum registro encontrado.' });
         }
 
         res.json(registros);
