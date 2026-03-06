@@ -98,7 +98,7 @@ export default class ClienteModel {
 
         erro = await this.validarDuplicidade();
         if (erro) return erro;
-
+        await this.buscarEndereco()
         return prisma.cliente.create({
             data: {
                 nome: this.nome,
@@ -173,6 +173,17 @@ export default class ClienteModel {
         return prisma.cliente.findMany({ where });
     }
 
+    static async buscarPorClima(filtros = {}) {
+        const resposta = await fetch(`https://viacep.com.br/ws/${filtros.cidade}/json/`);
+        const dados = await resposta.json();
+
+        if (dados.erro === 'true') {
+            return res.status(400).json({ error: 'Verifique novamente o cep (Bad request)' });
+        }
+        const buscarPorClima = await fetch(
+            `https://geocoding-api.open-meteo.com/v1/search?name=${dados.cidade}&count=1&language=pt&countryCode=BR`,
+        );
+    }
     static async buscarPorId(id) {
         if (!id) return { erro: 'ID inválido. Informe um número válido.' };
 
