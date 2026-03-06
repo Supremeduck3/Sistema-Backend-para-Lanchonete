@@ -10,7 +10,35 @@ export default class ProdutoModel {
         this.disponivel = disponivel;
     }
 
+    validar() {
+        if (!this.nome || this.nome.length < 3) {
+            throw new Error('O campo "nome" é obrigatório e deve conter pelo menos 3 caracteres.');
+        }
+        if (!this.descricao || this.descricao.length > 255) {
+            throw new Error(
+                'O campo "descricao" é obrigatório e deve conter no máximo 255 caracteres.',
+            );
+        }
+        if (this.preco === undefined || this.preco <= 0) {
+            throw new Error('O campo "preco" deve ser um número maior que zero.');
+        }
+
+        if (Math.floor(this.preco * 100) !== Math.round(this.preco * 1000) / 10) {
+            if (Math.floor(this.preco * 100) !== this.preco * 100) {
+                throw new Error('Preço inválido. Use no máximo 2 casas decimais.');
+            }
+        }
+        if (this.disponivel === undefined) {
+            throw new Error('O campo "disponivel" é obrigatório.');
+        }
+    }
+
     async criar() {
+        this.validar();
+        if (this.disponivel === false) {
+            throw new Error('O campo "disponivel" não pode ser false ao criar um produto.');
+        }
+
         return prisma.produto.create({
             data: {
                 nome: this.nome,
@@ -23,6 +51,7 @@ export default class ProdutoModel {
     }
 
     async atualizar() {
+        this.validar();
         return prisma.produto.update({
             where: { id: this.id },
             data: {
@@ -35,40 +64,41 @@ export default class ProdutoModel {
         });
     }
 
-    async excluir() {
+    async deletar() {
+        const pedidoEmAberto = await prisma.itemPedido.findFirst({
+            where: {
+                produtoId: this.id,
+                pedido: { status: 'ABERTO' },
+            },
+        });
+
+        if (pedidoEmAberto) {
+            throw new Error(
+                'Não é possível deletar este produto, pois ele está associado a um pedido em aberto.',
+            );
+        }
+
         return prisma.produto.delete({
             where: { id: this.id },
         });
     }
 
-    static async buscarTodos(filters) {
+    static async buscarTodos(filtros) {
         const where = {};
-
         if (filtros.nome) {
-            where.nome = {
-                contains: filters.nome,
-                mode: 'insensitive',
-            };
+            where.nome = { contains: filtros.nome, mode: 'insensitive' };
         }
-
         if (filtros.categoria) {
             where.categoria = filtros.categoria;
         }
-
         if (filtros.disponivel !== undefined) {
             where.disponivel = filtros.disponivel === 'true';
         }
-
         if (filtros.precoMin !== undefined || filtros.precoMax !== undefined) {
             where.preco = {};
-            if (filtros.precoMin !== undefined) {
-                where.preco.gte = parseFloat(filtros.precoMin);
-            }
-            if (filtros.precoMax !== undefined) {
-                where.preco.lte = parseFloat(filtros.precoMax);
-            }
+            if (filtros.precoMin !== undefined) where.preco.gte = parseFloat(filtros.precoMin);
+            if (filtros.precoMax !== undefined) where.preco.lte = parseFloat(filtros.precoMax);
         }
-
         return prisma.produto.findMany({ where });
     }
 
