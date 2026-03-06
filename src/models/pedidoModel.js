@@ -58,7 +58,7 @@ class PedidoModel {
         const pedido = await prisma.pedido.findUnique({
             where: { id },
             include: {
-                itens: true,
+                cliente: true,
             },
         });
 
