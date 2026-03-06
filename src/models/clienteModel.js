@@ -29,6 +29,7 @@ export default class ClienteModel {
 
 
     async buscarEndereco(cep) {
+        let cep = 
         const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const dados = await resposta.json();
 
@@ -63,8 +64,8 @@ export default class ClienteModel {
     }
 
     validarCEP() {
-        if (!this.cep || this.cep.length !== 9 || isNaN(this.cep))
-            return { erro: 'CEP deve conter exatamente 9 dígitos numéricos.' };
+        if (!this.cep || this.cep.length !== 8 || isNaN(this.cep))
+            return { erro: 'CEP deve conter exatamente 8 dígitos numéricos.' };
 
         return null;
     }
@@ -98,7 +99,7 @@ export default class ClienteModel {
 
         erro = await this.validarDuplicidade();
         if (erro) return erro;
-        
+
         const erroEndereco = await this.buscarEndereco();
         if (erroEndereco) return erroEndereco;
         return prisma.cliente.create({
