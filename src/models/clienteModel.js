@@ -27,20 +27,6 @@ export default class ClienteModel {
         this.ativo = ativo;
     }
 
-    validarNome() {
-        if (this.nome || this.nome.trim().length === 0) {
-            return { erro: 'O nome é obrigatório.' };
-        }
-
-        const tamanho = this.nome.trim().length;
-
-        if (tamanho < 3 || tamanho > 100) {
-            return { erro: 'O nome deve ter entre 3 e 100 caracteres.' };
-        }
-
-        return null;
-    }
-
     validarCPF() {
         if (!this.cpf || this.cpf.length !== 11 || isNaN(this.cpf))
             return { erro: 'CPF deve conter 11 dígitos numéricos.' };
@@ -49,8 +35,8 @@ export default class ClienteModel {
     }
 
     validarCEP() {
-        if (!this.cep || this.cep.length !== 9 || isNaN(this.cep))
-            return { erro: 'CEP deve conter exatamente 9 dígitos numéricos.' };
+        if (!this.cep || this.cep.length !== 8 || isNaN(this.cep))
+            return { erro: 'CEP deve conter exatamente 8 dígitos numéricos.' };
 
         return null;
     }
@@ -71,18 +57,6 @@ export default class ClienteModel {
         }
 
         return null;
-    }
-
-    validarTelefone() {
-        if (!this.telefone) {
-            return {erro: 'Telefone é obrigatório'}
-        }
-        if (isNaN(this.telefone)) {
-            return {erro: 'O campo telefone deve ser apenas números'}
-        }
-        if (this.telefone.length < 10 || this.telefone.length > 11) {
-            return {erro: 'O telefone deve ter entre 10 a 11 números'}
-        }
     }
 
     async criar() {
