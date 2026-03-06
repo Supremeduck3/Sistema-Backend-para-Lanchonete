@@ -15,6 +15,8 @@ export const criar = async (req, res) => {
             });
         }
 
+        const cepTest = cep 
+
         const cliente = new clienteModel({ nome, email, telefone, cpf, cep });
         const data = await cliente.criar();
 
