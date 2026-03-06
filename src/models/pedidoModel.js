@@ -1,4 +1,4 @@
-import prisma from '../utils/prisma.js';
+import prisma from '../utils/prismaClient.js';
 
 class PedidoModel {
     constructor({ id, clienteId, total = 0, status = 'ABERTO', criadoEm }) {
