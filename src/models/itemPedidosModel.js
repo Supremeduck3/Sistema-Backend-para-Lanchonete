@@ -60,6 +60,6 @@ export default class itemPedidoModel {
     static async buscarPorId(id) {
         const data = await prisma.itemPedido.findUnique({ where: { id } });
         if (!data) return null;
-        return new ExemploModel(data);
+        return new itemPedidoModel(data);
     }
 }
