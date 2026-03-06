@@ -145,21 +145,25 @@ export default class ClienteModel {
         return prisma.cliente.delete({ where: { id: this.id } });
     }
 
-    static async buscarTodos(filtros = {}) {
+    async buscarTodos(filtros = {}) {
         const where = {};
 
-        if (filtros.nome) where.nome = { contains: filtros.nome, mode: 'insensitive' };
+        if (filtros.nome) {
+            where.nome = { contains: filtros.nome, mode: 'insensitive' };
+        }
 
-        if (filtros.email) where.email = { contains: filtros.email, mode: 'insensitive' };
+        if (filtros.cpf) {
+            where.cpf = filtros.cpf;
+        }
 
-        if (filtros.cpf) where.cpf = filtros.cpf;
-
-        if (filtros.ativo !== undefined) where.ativo = filtros.ativo === 'true';
+        if (filtros.ativo !== undefined) {
+            where.ativo = filtros.ativo === 'true';
+        }
 
         return prisma.cliente.findMany({ where });
     }
 
- static async buscarPorId(id){
+    static async buscarPorId(id) {
         if (!id) return { erro: 'ID inválido. Informe um número válido.' };
 
         const data = await prisma.cliente.findUnique({ where: { id } });
@@ -169,9 +173,9 @@ export default class ClienteModel {
         return new ClienteModel(data);
     }
     static async buscarEndereco(cep) {
-    const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-    const dados = await resposta.json();
+        const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const dados = await resposta.json();
 
-    return dados
-}
+        return dados;
+    }
 }
