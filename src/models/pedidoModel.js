@@ -33,7 +33,7 @@ class PedidoModel {
         return pedido;
     }
 
-    static async buscarTodos(filtros) {
+    static async buscarTodos(filtros = {}) {
         const where = {};
 
         if (filtros.clienteId) {
@@ -64,7 +64,6 @@ class PedidoModel {
 
         return pedido;
     }
-
 
     async cancelar() {
         const pedido = await prisma.pedido.findUnique({
@@ -107,7 +106,6 @@ class PedidoModel {
 
         return pedidoPago;
     }
-
 
     static validarAdicaoItem(pedido) {
         if (!pedido) {
