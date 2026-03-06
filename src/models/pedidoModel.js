@@ -15,11 +15,11 @@ class PedidoModel {
         });
 
         if (!cliente) {
-            throw new Error('Cliente não encontrado.');
+            return { erro: 'Cliente não encontrado.' };
         }
 
         if (!cliente.ativo) {
-            throw new Error('Não é possível criar pedido para cliente inativo.');
+            return { erro: 'Não é possível criar pedido para cliente inativo.' };
         }
 
         const pedido = await prisma.pedido.create({
@@ -62,9 +62,12 @@ class PedidoModel {
             },
         });
 
+        if (!pedido) {
+            return { erro: 'Pedido não encontrado.' };
+        }
+
         return pedido;
     }
-
 
     async cancelar() {
         const pedido = await prisma.pedido.findUnique({
@@ -72,11 +75,11 @@ class PedidoModel {
         });
 
         if (!pedido) {
-            throw new Error('Pedido não encontrado.');
+            return { erro: 'Pedido não encontrado.' };
         }
 
         if (pedido.status !== 'ABERTO') {
-            throw new Error('Só é possível cancelar pedidos com status ABERTO.');
+            return { erro: 'Só é possível cancelar pedidos com status ABERTO.' };
         }
 
         const pedidoCancelado = await prisma.pedido.update({
@@ -93,11 +96,11 @@ class PedidoModel {
         });
 
         if (!pedido) {
-            throw new Error('Pedido não encontrado.');
+            return { erro: 'Pedido não encontrado.' };
         }
 
         if (pedido.status !== 'ABERTO') {
-            throw new Error('Somente pedidos ABERTOS podem ser pagos.');
+            return { erro: 'Somente pedidos ABERTOS podem ser pagos.' };
         }
 
         const pedidoPago = await prisma.pedido.update({
@@ -108,15 +111,16 @@ class PedidoModel {
         return pedidoPago;
     }
 
-
     static validarAdicaoItem(pedido) {
         if (!pedido) {
-            throw new Error('Pedido não encontrado.');
+            return { erro: 'Pedido não encontrado.' };
         }
 
         if (pedido.status === 'PAGO' || pedido.status === 'CANCELADO') {
-            throw new Error('Não é possível adicionar itens a um pedido PAGO ou CANCELADO.');
+            return { erro: 'Não é possível adicionar itens a um pedido PAGO ou CANCELADO.' };
         }
+
+        return true;
     }
 }
 
