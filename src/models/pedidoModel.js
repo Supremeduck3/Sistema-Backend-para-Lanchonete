@@ -1,99 +1,123 @@
 import prisma from '../utils/prisma.js';
-import pedidoModel from './pedidoModel.js';
 
-class ItempedidoModel {
-    constructor({ id, pedidoId, produtoId, quantidade, precoUnitario }) {
+class pedidoModel {
+    constructor({ id, clienteId, total = 0, status = 'ABERTO', criadoEm }) {
         this.id = id;
-        this.pedidoId = pedidoId;
-        this.produtoId = produtoId;
-        this.quantidade = quantidade;
-        this.precoUnitario = precoUnitario;
+        this.clienteId = clienteId;
+        this.total = total;
+        this.status = status;
+        this.criadoEm = criadoEm;
+    }
+
+    async criar() {
+        const cliente = await prisma.cliente.findUnique({
+            where: { id: this.clienteId },
+        });
+
+        if (!cliente) {
+            throw new Error('Cliente não encontrado.');
+        }
+
+        if (!cliente.ativo) {
+            throw new Error('Não é possível criar pedido para cliente inativo.');
+        }
+
+        const pedido = await prisma.pedido.create({
+            data: {
+                clienteId: this.clienteId,
+                status: 'ABERTO',
+                total: 0,
+            },
+        });
+
+        return pedido;
+    }
+
+    static async buscarTodos(filtros) {
+        const where = {};
+
+        if (filtros.clienteId) {
+            where.clienteId = parseInt(filtros.clienteId);
+        }
+
+        if (filtros.status) {
+            where.status = filtros.status;
+        }
+
+        const pedidos = await prisma.pedido.findMany({
+            where,
+            include: {
+                itens: true,
+            },
+        });
+
+        return pedidos;
+    }
+
+    static async buscarPorId(id) {
+        const pedido = await prisma.pedido.findUnique({
+            where: { id },
+            include: {
+                itens: true,
+            },
+        });
+
+        return pedido;
     }
 
 
-    async criar() {
-
+    async cancelar() {
         const pedido = await prisma.pedido.findUnique({
-            where: { id: this.pedidoId },
+            where: { id: this.id },
         });
 
         if (!pedido) {
             throw new Error('Pedido não encontrado.');
         }
 
-
-        pedidoModel.validarAdicaoItem(pedido);
-
-        const produto = await prisma.produto.findUnique({
-            where: { id: this.produtoId },
-        });
-
-        if (!produto) {
-            throw new Error('Produto não encontrado.');
+        if (pedido.status !== 'ABERTO') {
+            throw new Error('Só é possível cancelar pedidos com status ABERTO.');
         }
 
-        if (!produto.disponivel) {
-            throw new Error('Produto indisponível não pode ser adicionado ao pedido.');
-        }
-
-        const itemCriado = await prisma.itemPedido.create({
-            data: {
-                pedidoId: this.pedidoId,
-                produtoId: this.produtoId,
-                quantidade: this.quantidade,
-                precoUnitario: produto.preco,
-            },
+        const pedidoCancelado = await prisma.pedido.update({
+            where: { id: this.id },
+            data: { status: 'CANCELADO' },
         });
 
-        await ItempedidoModel.recalcularTotalPedido(this.pedidoId);
-
-        return itemCriado;
+        return pedidoCancelado;
     }
 
-    async deletar() {
-        const item = await prisma.itemPedido.findUnique({
-            where: { id: this.id },
-        });
-
-        if (!item) {
-            throw new Error('Item do pedido não encontrado.');
-        }
-
+    async pagar() {
         const pedido = await prisma.pedido.findUnique({
-            where: { id: item.pedidoId },
-        });
-
-        pedidoModel.validarAdicaoItem(pedido);
-
-        await prisma.itemPedido.delete({
             where: { id: this.id },
         });
 
-        await ItempedidoModel.recalcularTotalPedido(item.pedidoId);
+        if (!pedido) {
+            throw new Error('Pedido não encontrado.');
+        }
+
+        if (pedido.status !== 'ABERTO') {
+            throw new Error('Somente pedidos ABERTOS podem ser pagos.');
+        }
+
+        const pedidoPago = await prisma.pedido.update({
+            where: { id: this.id },
+            data: { status: 'PAGO' },
+        });
+
+        return pedidoPago;
     }
 
-    static async buscarPorPedido(pedidoId) {
-        return await prisma.itemPedido.findMany({
-            where: { pedidoId },
-        });
-    }
 
-    static async recalcularTotalPedido(pedidoId) {
-        const itens = await prisma.itemPedido.findMany({
-            where: { pedidoId },
-        });
+    static validarAdicaoItem(pedido) {
+        if (!pedido) {
+            throw new Error('Pedido não encontrado.');
+        }
 
-        const total = itens.reduce((soma, item) => {
-            return soma + item.quantidade * item.precoUnitario;
-        }, 0);
-
-        await prisma.pedido.update({
-            where: { id: pedidoId },
-            data: { total },
-        });
-
-        return total;
+        if (pedido.status === 'PAGO' || pedido.status === 'CANCELADO') {
+            throw new Error('Não é possível adicionar itens a um pedido PAGO ou CANCELADO.');
+        }
     }
 }
 
-export default ItempedidoModel;
+export default pedidoModel;
