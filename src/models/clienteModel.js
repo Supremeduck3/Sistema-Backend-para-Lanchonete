@@ -1,5 +1,10 @@
 import prisma from '../utils/prismaClient.js';
+ async function buscarEndereco(cep) {
+    const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const dados = await resposta.json();
 
+    return cep
+ }
 export default class ClienteModel {
     constructor({
         id = null,
@@ -25,6 +30,21 @@ export default class ClienteModel {
         this.localidade = localidade;
         this.uf = uf;
         this.ativo = ativo;
+    }
+
+
+    validarNome() {
+        if (this.nome || this.nome.trim().length === 0) {
+            return { erro: 'O nome é obrigatório.' };
+        }
+
+        const tamanho = this.nome.trim().length;
+
+        if (tamanho < 3 || tamanho > 100) {
+            return { erro: 'O nome deve ter entre 3 e 100 caracteres.' };
+        }
+
+        return null;
     }
 
     validarCPF() {
