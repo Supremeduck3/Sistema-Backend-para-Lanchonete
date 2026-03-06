@@ -1,4 +1,11 @@
 import prisma from '../utils/prismaClient.js';
+async function buscarEndereco(cep) {
+    const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const dados = await resposta.json();
+
+    return dados
+}
+
 export default class ClienteModel {
     constructor({
         id = null,
