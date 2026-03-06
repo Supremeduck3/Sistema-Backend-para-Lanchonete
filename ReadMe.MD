@@ -1,48 +1,66 @@
-# 1. Criar projeto
-- npm init -y
+# Sistema Backend para Lanchonete
 
-# 2. Ajustar package.json
-- Adicionar: "type": "module"
-- Adicionar: "main": "server.js"
-- Adicionar dentro do script: "dev": "nodemon server.js"
+Um sistema CRUD completo para gerenciamento de uma lanchonete, desenvolvido com Node.js, Express e
+Prisma ORM.
 
-# 3. Instalar dependência
-- npm i express dotenv pg @prisma/client @prisma/adapter-pg
-- npm i -D nodemon prisma
+## 📋 Descrição
 
-# 4. Inicializar Prisma
-- npx prisma init --datasource-provider postgresql
+Este projeto implementa um backend RESTful para uma lanchonete, permitindo o gerenciamento de
+clientes, produtos, pedidos e itens de pedido. O sistema inclui validações de negócio e utiliza
+PostgreSQL como banco de dados.
 
-# 5. Configurar `.env`
-- DATABASE_URL="postgresql://usuario:senha@localhost:porta/nome_do_banco_db"
+## 🚀 Funcionalidades
 
-# 6. Configurar schema.prisma
-- crie suas tabelas
+- **Gerenciamento de Clientes**: CRUD completo com validações de CPF, telefone e email únicos
+- **Gerenciamento de Produtos**: CRUD com categorias (Lanche, Bebida, Sobremesa, Combo) e controle
+  de disponibilidade
+- **Gerenciamento de Pedidos**: Criação, listagem, pagamento e cancelamento de pedidos
+- **Gerenciamento de Itens de Pedido**: Adição de produtos aos pedidos com validações
 
-# 7. Gerar SQL
-- npx prisma migrate dev --name init
-- npx prisma generate
+## 🛠️ Tecnologias Utilizadas
 
-# 8. Semear dados no banco
-- npx prisma db seed
+- **Node.js** - Runtime JavaScript
+- **Express.js** - Framework web
+- **Prisma** - ORM para banco de dados
+- **PostgreSQL** - Banco de dados relacional
+- **Dotenv** - Gerenciamento de variáveis de ambiente
 
-# 9. Abrir Prisma Studio
-- npx prisma studio
+## 🗄️ Modelo de Dados
 
-## Casos de erros
+```
+Cliente
+├── id (PK)
+├── nome
+├── telefone (unique)
+├── email (unique, optional)
+├── cpf (unique, optional)
+├── cep
+├── logradouro
+├── bairro
+├── localidade
+├── uf
+└── ativo (default: true)
 
-### Após alterar schema.prisma
-- npx prisma migrate dev --name nome_da_alteracao (exemplo: adicionar_tabela_users)
+Produto
+├── id (PK)
+├── nome
+├── descricao
+├── categoria (enum)
+├── preco (decimal 10,2)
+└── disponivel (boolean)
 
-### Banco inconsistente (⚠️ APAGA TUDO)
-- npx prisma migrate reset
+Pedido
+├── id (PK)
+├── clienteId (FK)
+├── total (decimal 10,2)
+├── status (enum: ABERTO, PAGO, CANCELADO)
+└── criadoEm (datetime)
 
-### Apenas popular dados
-- npx prisma db seed
-
-### Dicas
-|   Comando       | Apaga dados?    | Cria migrations? | Uso            |
-| --------------- | ------------    | ---------------- | -------------- |
-| `migrate dev`   | ❌ Não          | ✅ Sim          | Alterar schema |
-| `db seed`       | ❌ Não          | ❌ Não          | Popular dados  |
-| `migrate reset` | ✅ SIM          | ❌ Não          | DEV only       |
+ItemPedido
+├── id (PK)
+├── pedidoId (FK)
+├── produtoId (FK)
+├── quantidade
+└── precoUnitario (decimal 10,2)
+``
+```
