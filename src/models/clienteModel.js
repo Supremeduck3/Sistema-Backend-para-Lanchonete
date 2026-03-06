@@ -27,6 +27,20 @@ export default class ClienteModel {
         this.ativo = ativo;
     }
 
+
+    async buscarEndereco(cep) {
+        const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const dados = await resposta.json();
+
+        if (dados.erro === 'true') {
+            return res.status(400).json({ error: 'Verifique novamente o cep (Bad request)' });
+        }
+        this.logradouro = dados.logradouro
+        this.bairro = dados.bairro
+        this.localidade = dados.localidade
+        this.uf = dados.uf
+
+    }
     validarNome() {
         if (this.nome || this.nome.trim().length === 0) {
             return { erro: 'O nome é obrigatório.' };
@@ -49,8 +63,8 @@ export default class ClienteModel {
     }
 
     validarCEP() {
-        if (!this.cep || this.cep.length !== 8 || isNaN(this.cep))
-            return { erro: 'CEP deve conter exatamente 8 dígitos numéricos.' };
+        if (!this.cep || this.cep.length !== 9 || isNaN(this.cep))
+            return { erro: 'CEP deve conter exatamente 9 dígitos numéricos.' };
 
         return null;
     }
@@ -159,7 +173,7 @@ export default class ClienteModel {
         return prisma.cliente.findMany({ where });
     }
 
- static async buscarPorId(id){
+    static async buscarPorId(id) {
         if (!id) return { erro: 'ID inválido. Informe um número válido.' };
 
         const data = await prisma.cliente.findUnique({ where: { id } });
@@ -168,10 +182,4 @@ export default class ClienteModel {
 
         return new ClienteModel(data);
     }
-    static async buscarEndereco(cep) {
-    const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-    const dados = await resposta.json();
-
-    return dados
-}
 }
