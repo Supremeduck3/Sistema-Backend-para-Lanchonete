@@ -32,7 +32,6 @@ export default class ClienteModel {
         this.ativo = ativo;
     }
 
-
     validarNome() {
         if (this.nome || this.nome.trim().length === 0) {
             return { erro: 'O nome é obrigatório.' };
@@ -152,9 +151,6 @@ export default class ClienteModel {
     }
 
     async buscarTodos(filtros = {}) {
-        if (!Object.keys(filtros).length)
-            return { erro: 'Informe pelo menos um parâmetro para filtro.' };
-
         const where = {};
 
         if (filtros.nome) where.nome = { contains: filtros.nome, mode: 'insensitive' };
