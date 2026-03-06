@@ -1,4 +1,4 @@
-import clienteModel from '../models/clienteModel.js';
+import LanchoneteModel from './../models/clienteModel';
 
 export const criar = async (req, res) => {
     try {
