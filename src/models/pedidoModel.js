@@ -1,6 +1,6 @@
 import prisma from '../utils/prisma.js';
 
-class pedidoModel {
+class PedidoModel {
     constructor({ id, clienteId, total = 0, status = 'ABERTO', criadoEm }) {
         this.id = id;
         this.clienteId = clienteId;
@@ -120,4 +120,4 @@ class pedidoModel {
     }
 }
 
-export default pedidoModel;
+export default PedidoModel;

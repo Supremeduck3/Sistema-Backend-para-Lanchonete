@@ -37,7 +37,6 @@ export const criar = async (req, res) => {
     }
 };
 
-
 export const buscarTodos = async (req, res) => {
     try {
         const { status, clienteId } = req.query;
@@ -65,7 +64,6 @@ export const buscarTodos = async (req, res) => {
     }
 };
 
-
 export const buscarPorId = async (req, res) => {
     try {
         const { id } = req.params;
@@ -92,7 +90,6 @@ export const buscarPorId = async (req, res) => {
         });
     }
 };
-
 
 export const pagar = async (req, res) => {
     try {
@@ -136,7 +133,6 @@ export const pagar = async (req, res) => {
         });
     }
 };
-
 
 export const cancelar = async (req, res) => {
     try {
