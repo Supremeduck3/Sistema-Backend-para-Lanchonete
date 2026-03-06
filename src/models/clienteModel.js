@@ -98,7 +98,9 @@ export default class ClienteModel {
 
         erro = await this.validarDuplicidade();
         if (erro) return erro;
-        await this.buscarEndereco()
+        
+        const erroEndereco = await this.buscarEndereco();
+        if (erroEndereco) return erroEndereco;
         return prisma.cliente.create({
             data: {
                 nome: this.nome,
@@ -112,6 +114,7 @@ export default class ClienteModel {
                 uf: this.uf,
                 ativo: this.ativo,
             },
+
         });
     }
 
