@@ -1,6 +1,6 @@
 import prisma from '../utils/prismaClient.js';
 
-export default class ClienteModel {
+export default class clienteModel {
     constructor({
         id = null,
         nome,
