@@ -151,7 +151,7 @@ export default class ClienteModel {
         return prisma.cliente.delete({ where: { id: this.id } });
     }
 
-    async buscarTodos(filtros = {}) {
+    static async buscarTodos(filtros = {}) {
         const where = {};
 
         if (filtros.nome) where.nome = { contains: filtros.nome, mode: 'insensitive' };
@@ -165,7 +165,7 @@ export default class ClienteModel {
         return prisma.cliente.findMany({ where });
     }
 
-    async buscarPorId(id) {
+ static async buscarPorId(id){
         if (!id) return { erro: 'ID inválido. Informe um número válido.' };
 
         const data = await prisma.cliente.findUnique({ where: { id } });
