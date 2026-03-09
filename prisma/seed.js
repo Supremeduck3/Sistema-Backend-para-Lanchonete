@@ -4,66 +4,81 @@ const { PrismaClient } = pkg;
 import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
 
+import ClienteModel from '../src/models/clienteModel.js';
+
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-    console.log('🌱 Resetando tabela exemplo...');
-
+    console.log('🌱 Limpando banco de dados...');
     await prisma.itemPedido.deleteMany();
     await prisma.pedido.deleteMany();
     await prisma.produto.deleteMany();
     await prisma.cliente.deleteMany();
 
-    console.log('📦 Inserindo novos registros...');
+    const clientesRaw = [
+        {
+            nome: 'Lucas Oliveira',
+            telefone: '11988887777',
+            email: 'lucas.oliveira@email.com',
+            cpf: '123.456.789-01',
+            cep: '01310100',
+            ativo: true,
+        },
+        {
+            nome: 'Mariana Souza',
+            telefone: '21977776666',
+            email: 'mari.souza@provedor.net',
+            cpf: '234.567.890-12',
+            cep: '20040002',
+            ativo: true,
+        },
+        {
+            nome: 'Ricardo Mendes',
+            telefone: '31966665555',
+            email: 'mendes.ricardo@empresa.com.br',
+            cpf: '345.678.901-23',
+            cep: '30140010',
+            ativo: true,
+        },
+        {
+            nome: 'Beatriz Lopes',
+            telefone: '11955554444',
+            email: 'bi.lopes@gmail.com',
+            cpf: '456.789.012-34',
+            cep: '04571010',
+            ativo: true,
+        },
+        {
+            nome: 'Carlos Eduardo',
+            telefone: '11944443333',
+            email: 'cadu@uol.com.br',
+            cpf: '567.890.123-45',
+            cep: '01001000',
+            ativo: false,
+        },
+    ];
 
-    await prisma.cliente.createMany({
-        data: [
-            {
-                nome: 'Lucas Oliveira',
-                telefone: '11988887777',
-                email: 'lucas.oliveira@email.com',
-                cpf: '123.456.789-01',
-                cep: '01310100',
-                ativo: true,
-            },
-            {
-                nome: 'Mariana Souza',
-                telefone: '21977776666',
-                email: 'mari.souza@provedor.net',
-                cpf: '234.567.890-12',
-                cep: '20040002',
-                ativo: true,
-            },
-            {
-                nome: 'Ricardo Mendes',
-                telefone: '31966665555',
-                email: 'mendes.ricardo@empresa.com.br',
-                cpf: '345.678.901-23',
-                cep: '30140010',
-                ativo: true,
-            },
-            {
-                nome: 'Beatriz Lopes',
-                telefone: '11955554444',
-                email: 'bi.lopes@gmail.com',
-                cpf: '456.789.012-34',
-                cep: '04571010',
-                ativo: true,
-            },
-            {
-                nome: 'Carlos Eduardo',
-                telefone: '11944443333',
-                email: 'cadu@uol.com.br',
-                cpf: '567.890.123-45',
-                cep: '01001000',
-                ativo: false,
-            },
-        ],
-    });
+    console.log('🔍 Buscando endereços na ViaCEP...');
+    const clientesComEndereco = await Promise.all(
+        clientesRaw.map(async (dados) => {
+            const model = new ClienteModel();
+            await model.buscarEndereco(dados.cep);
+            return {
+                ...dados,
+                logradouro: model.logradouro || '',
+                bairro: model.bairro || '',
+                localidade: model.localidade || '',
+                uf: model.uf || '',
+            };
+        }),
+    );
 
-    // 3. CREATE MANY - PRODUTOS
+    console.log('📦 Inserindo clientes...');
+    await prisma.cliente.createMany({ data: clientesComEndereco });
+
+    console.log('📦 Inserindo produtos...');
     await prisma.produto.createMany({
         data: [
             {
@@ -117,9 +132,11 @@ async function main() {
             },
         ],
     });
-const todosClientes = await prisma.cliente.findMany();
-const todosProdutos = await prisma.produto.findMany();
-    // 4. CREATE MANY - PEDIDOS
+
+    const todosClientes = await prisma.cliente.findMany();
+    const todosProdutos = await prisma.produto.findMany();
+
+    console.log('📦 Inserindo pedidos...');
     await prisma.pedido.createMany({
         data: [
             { clienteId: todosClientes[0].id, total: 43.9, status: 'PAGO' },
@@ -127,11 +144,12 @@ const todosProdutos = await prisma.produto.findMany();
             { clienteId: todosClientes[2].id, total: 110.0, status: 'CANCELADO' },
         ],
     });
-const todosPedidos = await prisma.pedido.findMany();
-    // 5. CREATE MANY - ITENS DO PEDIDO
+
+    const todosPedidos = await prisma.pedido.findMany();
+
+    console.log('📦 Inserindo itens dos pedidos...');
     await prisma.itemPedido.createMany({
         data: [
-            // Itens do primeiro pedido
             {
                 pedidoId: todosPedidos[0].id,
                 produtoId: todosProdutos[0].id,
@@ -144,14 +162,12 @@ const todosPedidos = await prisma.pedido.findMany();
                 quantidade: 1,
                 precoUnitario: 15.0,
             },
-            // Itens do segundo pedido
             {
                 pedidoId: todosPedidos[1].id,
                 produtoId: todosProdutos[0].id,
                 quantidade: 1,
                 precoUnitario: 28.9,
             },
-            // Itens do terceiro pedido
             {
                 pedidoId: todosPedidos[2].id,
                 produtoId: todosProdutos[6].id,
@@ -161,7 +177,7 @@ const todosPedidos = await prisma.pedido.findMany();
         ],
     });
 
-    console.log('✅ Seed concluído!');
+    console.log('✅ Seed finalizado com sucesso!');
 }
 
 main()
