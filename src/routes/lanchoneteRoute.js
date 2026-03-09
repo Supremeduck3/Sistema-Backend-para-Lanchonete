@@ -3,6 +3,7 @@ import * as controller from '../controllers/clientController.js';
 import * as controller1 from '../controllers/pedidoController.js';
 import * as controller2 from '../controllers/produtoControllers.js';
 import * as controller3 from '../controllers/itemPedidoController.js';
+import autenticarApiKey from ''
 
 const router = express.Router();
 

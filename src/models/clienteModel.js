@@ -29,7 +29,6 @@ export default class ClienteModel {
 
 // converter o cep para int
     async buscarEndereco(cep) {
-        let cep =
         const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const dados = await resposta.json();
 
