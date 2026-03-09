@@ -1,8 +1,9 @@
-async function buscarEndereco(cep) {
-    const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-    const dados = await resposta.json();
+const resposta = await fetch(`https://viacep.com.br/ws/${filtros.cidade}/json/`);
+const dados = await resposta.json();
 
-    console.log(dados);
+if (dados.erro === 'true') {
+    return console.log('erro')
 }
-
-buscarEndereco(66073426);
+const buscarPorClima = await fetch(
+    `https://geocoding-api.open-meteo.com/v1/search?name=${dados.cidade}&count=1&language=pt&countryCode=BR`,
+);

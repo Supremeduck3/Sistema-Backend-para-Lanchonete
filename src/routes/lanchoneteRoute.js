@@ -1,16 +1,18 @@
 import express from 'express';
+import autenticar1 from './../utils/apiKey.js'
 import * as controller from '../controllers/clientController.js';
 import * as controller1 from '../controllers/pedidoController.js';
 import * as controller2 from '../controllers/produtoControllers.js';
 import * as controller3 from '../controllers/itemPedidoController.js';
+import autenticar from '../utils/apiKey.js';
 
 const router = express.Router();
 
-router.post('/cliente', controller.criar);
-router.get('/cliente', controller.buscarTodos);
-router.get('/cliente/:id', controller.buscarPorId);
-router.put('/cliente/:id', controller.atualizar);
-router.delete('/cliente/:id', controller.deletar);
+router.post('/clientes', autenticar1, controller.criar);
+router.get('/clientes', autenticar1, controller.buscarTodos);
+router.get('/clientes/:id', autenticar1, controller.buscarPorId);
+router.put('/clientes/:id', autenticar1, controller.atualizar);
+router.delete('/clientes/:id', autenticar1, controller.deletar);
 
 router.post('/pedidos', controller1.criar);
 router.get('/pedidos', controller1.buscarTodos);
