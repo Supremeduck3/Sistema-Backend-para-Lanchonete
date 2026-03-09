@@ -1,4 +1,5 @@
 import clienteModel from './../models/clienteModel.js';
+import { buscarClimaPorCep } from '../services/climaService.js';
 
 export const criar = async (req, res) => {
     try {
@@ -6,8 +7,7 @@ export const criar = async (req, res) => {
             return res.status(400).json({ error: 'Corpo da requisição vazio. Envie os dados!' });
         }
 
-        const { nome, telefone, email, cpf, cep } =
-            req.body;
+        const { nome, telefone, email, cpf, cep } = req.body;
 
         if (!nome || !telefone || !email || !cpf || !cep) {
             return res.status(400).json({
@@ -15,7 +15,7 @@ export const criar = async (req, res) => {
             });
         }
 
-        const cepTest = cep
+        const cepTest = cep;
 
         const cliente = new clienteModel({ nome, email, telefone, cpf, cep });
         const data = await cliente.criar();
@@ -113,9 +113,37 @@ export const deletar = async (req, res) => {
 
         await cliente.deletar();
 
-        res.json({ message: `O registro "${cliente.nome}" foi deletado com sucesso!`, deletado: cliente });
+        res.json({
+            message: `O registro "${cliente.nome}" foi deletado com sucesso!`,
+            deletado: cliente,
+        });
     } catch (error) {
         console.error('Erro ao deletar:', error);
         res.status(500).json({ error: 'Erro ao deletar registro.' });
     }
 };
+
+class ClienteController {
+    static async climaCliente(req, res) {
+        const { id } = req.params;
+
+        const cliente = await ClienteModel.buscarPorId(id);
+
+        if (!cliente) {
+            return res.status(404).json({ erro: 'Cliente não encontrado' });
+        }
+
+        const clima = await buscarClimaPorCep(cliente.cep);
+
+        if (clima?.erro) {
+            return res.status(400).json({ erro: 'CEP inválido' });
+        }
+
+        return res.json({
+            cliente,
+            clima,
+        });
+    }
+};
+
+export default ClienteController;
