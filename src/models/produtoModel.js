@@ -65,20 +65,19 @@ export default class ProdutoModel {
     }
 
     async deletar() {
-        const pedidoEmAberto = await prisma.itemPedido.findFirst({
+        // Agora o Prisma reconhece o campo 'pedido' e o campo 'produtoId'
+        const itemEmAberto = await prisma.itemPedido.findFirst({
             where: {
                 produtoId: this.id,
                 pedido: {
-                    is: {
-                        status: 'ABERTO',
-                    },
+                    status: 'ABERTO',
                 },
             },
         });
 
-        if (pedidoEmAberto) {
+        if (itemEmAberto) {
             throw new Error(
-                'Não é possível deletar este produto, pois ele está associado a um pedido em aberto.',
+                'Não é possível deletar este produto, pois ele está em um pedido aberto.',
             );
         }
 

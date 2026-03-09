@@ -37,6 +37,7 @@ model Produto {
     categoria  Categoria
     preco      Decimal   @db.Decimal(10, 2)
     disponivel Boolean   @default(true)
+    itens    ItemPedido[]
 
     @@map("produto")
 }
@@ -54,6 +55,7 @@ model Pedido {
     total     Decimal      @db.Decimal(10, 2)
     status    StatusPedido
     criadoEm  DateTime     @default(now())
+    itens ItemPedido[]
 
     @@map("pedido")
 }
@@ -64,6 +66,8 @@ model ItemPedido {
     produtoId     Int
     quantidade    Int
     precoUnitario Decimal @db.Decimal(10, 2)
+    pedido  Pedido  @relation(fields: [pedidoId], references: [id])
+  produto Produto @relation(fields: [produtoId], references: [id])
 
     @@map("itemPedido")
 }
