@@ -27,7 +27,6 @@ export const criar = async (req, res) => {
         console.error('Erro ao criar:', error);
         return res.status(500).json({ error: 'Erro interno ao salvar o registro.' });
     }
-
 };
 
 export const buscarTodos = async (req, res) => {
@@ -126,7 +125,6 @@ export const deletar = async (req, res) => {
     }
 };
 
-
 class ClienteController {
     static async climaCliente(req, res) {
         const { id } = req.params;
@@ -148,6 +146,27 @@ class ClienteController {
             clima,
         });
     }
-};
+}
 
-export default ClienteController;
+export async function climaCliente(req, res) {
+    const { id } = req.params;
+
+    const cliente = await prisma.cliente.findUnique({
+        where: { id: Number(id) },
+    });
+
+    if (!cliente) {
+        return res.status(404).json({ erro: 'Cliente não encontrado' });
+    }
+
+    const clima = await buscarClimaPorCep(cliente.cep);
+
+    if (clima?.erro) {
+        return res.status(400).json({ erro: clima.erro });
+    }
+
+    return res.json({
+        cliente,
+        clima,
+    });
+}

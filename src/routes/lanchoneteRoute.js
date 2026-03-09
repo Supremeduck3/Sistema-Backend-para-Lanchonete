@@ -13,6 +13,8 @@ router.get('/clientes', autenticar1, controller.buscarTodos);
 router.get('/clientes/:id', autenticar1, controller.buscarPorId);
 router.put('/clientes/:id', autenticar1, controller.atualizar);
 router.delete('/clientes/:id', autenticar1, controller.deletar);
+router.get('/clientes/:id/clima', autenticar1, controller.climaCliente);
+
 
 router.post('/pedidos', controller1.criar);
 router.get('/pedidos', controller1.buscarTodos);
