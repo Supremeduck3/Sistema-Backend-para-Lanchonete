@@ -115,12 +115,12 @@ export const pagar = async (req, res) => {
             });
         }
 
-        const pedidoModel = new pedidoModel({
+        const pedidosModel = new pedidoModel({
             id: pedido.id,
             status: 'PAGO',
         });
 
-        const data = await pedidoModel.atualizarStatus();
+        const data = await pedidosModel.atualizarStatus();
 
         return res.status(200).json({
             message: 'Pedido pago com sucesso!',
@@ -144,35 +144,19 @@ export const cancelar = async (req, res) => {
             });
         }
 
-        const pedido = await pedidoModel.buscarPorId(Number(id));
-
-        if (!pedido) {
-            return res.status(404).json({
-                erro: 'Pedido não encontrado.',
-            });
-        }
-
-        try {
-            pedidoModel.validarCancelamento(pedido);
-        } catch (erro) {
-            return res.status(400).json({ erro: erro.message });
-        }
-
-        const pedidoModel = new pedidoModel({
-            id: pedido.id,
-            status: 'CANCELADO',
+        const pedidosModel = new pedidoModel({
+            id: Number(id),
         });
 
-        const data = await pedidoModel.atualizarStatus();
+        const data = await pedidosModel.cancelar();
 
         return res.status(200).json({
             message: 'Pedido cancelado com sucesso!',
             data,
         });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            erro: 'Erro interno ao cancelar pedido.',
+        return res.status(400).json({
+            erro: error.message,
         });
     }
 };
