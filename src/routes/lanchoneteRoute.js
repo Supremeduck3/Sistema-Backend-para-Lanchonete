@@ -1,5 +1,5 @@
 import express from 'express';
-import autenticarApikey from './../utils/apiKey.js'
+import autenticar1 from './../utils/apiKey.js'
 import * as controller from '../controllers/clientController.js';
 import * as controller1 from '../controllers/pedidoController.js';
 import * as controller2 from '../controllers/produtoControllers.js';
@@ -8,12 +8,11 @@ import autenticar from '../utils/apiKey.js';
 
 const router = express.Router();
 
-router.post('/clientes', autenticar, controller.criar);
-router.get('/clientes', autenticar, controller.buscarTodos);
-router.get('/clientes/:id', autenticar, controller.buscarPorId);
-router.put('/clientes/:id', autenticar, controller.atualizar);
-router.delete('/clientes/:id', autenticar, controller.deletar);
-router.get('/clientes/:id/clima', ClienteController.climaCliente);
+router.post('/clientes', autenticar1, controller.criar);
+router.get('/clientes', autenticar1, controller.buscarTodos);
+router.get('/clientes/:id', autenticar1, controller.buscarPorId);
+router.put('/clientes/:id', autenticar1, controller.atualizar);
+router.delete('/clientes/:id', autenticar1, controller.deletar);
 
 router.post('/pedidos', controller1.criar);
 router.get('/pedidos', controller1.buscarTodos);

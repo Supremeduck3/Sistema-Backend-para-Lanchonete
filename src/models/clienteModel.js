@@ -27,11 +27,11 @@ export default class ClienteModel {
         this.ativo = ativo;
     }
 
-// converter o cep para int
+    // converter o cep para int
     async buscarEndereco(cep) {
         let ce = String(cep).replace(/\D/g, '');
-        if (ce.length !== 8) {
-            return { error: 'Formato de CEP inválido (deve ter 8 dígitos)' };
+        if (ce.length !== 9) {
+            return { error: 'Formato de CEP inválido (deve ter 9 dígitos)' };
         }
 
         try {
@@ -51,7 +51,6 @@ export default class ClienteModel {
             this.uf = String(dados.uf);
             return null;
         } catch (err) {
-            // Captura erros de rede (ex: falta de internet)
             return { error: 'Não foi possível conectar ao serviço de busca' };
         }
     }
@@ -76,8 +75,6 @@ export default class ClienteModel {
         return null;
     }
 
-
-
     async validarDuplicidade() {
         let cpf = String(this.cpf);
         const existente = await prisma.cliente.findFirst({
@@ -97,23 +94,44 @@ export default class ClienteModel {
         return null;
     }
 
+    validarTelefone() {
+        if (
+            !this.telefone ||
+            this.telefone.length < 10 ||
+            isNaN(this.telefone) ||
+            this.telefone.length > 11
+        )
+            return { erro: 'O telefone deve conter 10 ou 11 dígitos numéricos.' };
+
+        return null;
+    }
+
+    validarEmail() {
+        if (!this.email) return null;
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(this.email)) {
+            return { erro: 'O e-mail informado possui um formato inválido.' };
+        }
+
+        return null;
+    }
+
     async criar() {
         if (!this.nome) return { erro: "O campo 'nome' é obrigatório." };
 
         let erro = this.validarCPF();
         if (erro) return erro;
 
-
-
         erro = await this.validarDuplicidade();
         if (erro) return erro;
 
-        const cep = parseInt(this.cep)
+        const cep = parseInt(this.cep);
         const erroEndereco = await this.buscarEndereco(cep);
         if (erroEndereco) return erroEndereco;
 
-
-        let cpf = String(this.cpf)
+        let cpf = String(this.cpf);
         return prisma.cliente.create({
             data: {
                 nome: this.nome,
@@ -127,7 +145,6 @@ export default class ClienteModel {
                 uf: this.uf,
                 ativo: this.ativo,
             },
-
         });
     }
 
