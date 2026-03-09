@@ -192,31 +192,24 @@ export default class ClienteModel {
         return prisma.cliente.delete({ where: { id: this.id } });
     }
 
-    static async buscarTodos(filtros = {}) {
+    async buscarTodos(filtros = {}) {
         const where = {};
 
-        if (filtros.nome) where.nome = { contains: filtros.nome, mode: 'insensitive' };
+        if (filtros.nome) {
+            where.nome = { contains: filtros.nome, mode: 'insensitive' };
+        }
 
-        if (filtros.email) where.email = { contains: filtros.email, mode: 'insensitive' };
+        if (filtros.cpf) {
+            where.cpf = filtros.cpf;
+        }
 
-        if (filtros.cpf) where.cpf = filtros.cpf;
-
-        if (filtros.ativo !== undefined) where.ativo = filtros.ativo === 'true';
+        if (filtros.ativo !== undefined) {
+            where.ativo = filtros.ativo === 'true';
+        }
 
         return prisma.cliente.findMany({ where });
     }
 
-    static async buscarPorClima(filtros = {}) {
-        const resposta = await fetch(`https://viacep.com.br/ws/${filtros.cidade}/json/`);
-        const dados = await resposta.json();
-
-        if (dados.erro === 'true') {
-            return res.status(400).json({ error: 'Verifique novamente o cep (Bad request)' });
-        }
-        const buscarPorClima = await fetch(
-            `https://geocoding-api.open-meteo.com/v1/search?name=${dados.cidade}&count=1&language=pt&countryCode=BR`,
-        );
-    }
     static async buscarPorId(id) {
         if (!id) return { erro: 'ID inválido. Informe um número válido.' };
 
@@ -225,5 +218,11 @@ export default class ClienteModel {
         if (!data) return null;
 
         return new ClienteModel(data);
+    }
+    static async buscarEndereco(cep) {
+        const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const dados = await resposta.json();
+
+        return dados;
     }
 }
