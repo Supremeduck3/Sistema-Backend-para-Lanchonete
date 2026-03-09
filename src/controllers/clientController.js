@@ -15,11 +15,13 @@ export const criar = async (req, res) => {
             });
         }
 
-        const cepTest = cep;
-
         const cliente = new clienteModel({ nome, email, telefone, cpf, cep });
         const data = await cliente.criar();
 
+        if (data && data.erro) {
+            return res.status(400).json({ error: data.erro });
+        }
+        
         return res.status(201).json({ message: 'Registro criado com sucesso!', data });
     } catch (error) {
         console.error('Erro ao criar:', error);

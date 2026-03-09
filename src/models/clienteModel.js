@@ -29,21 +29,34 @@ export default class ClienteModel {
 
 // converter o cep para int
     async buscarEndereco(cep) {
-        let cep =
-        const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-        const dados = await resposta.json();
-
-        if (dados.erro === 'true') {
-            return res.status(400).json({ error: 'Verifique novamente o cep (Bad request)' });
+        let ce = String(cep).replace(/\D/g, '');
+        if (ce.length !== 8) {
+            return { error: 'Formato de CEP inválido (deve ter 8 dígitos)' };
         }
-        this.logradouro = dados.logradouro
-        this.bairro = dados.bairro
-        this.localidade = dados.localidade
-        this.uf = dados.uf
 
+        try {
+            const resposta = await fetch(`https://viacep.com.br/ws/${ce}/json/`);
+
+            if (!resposta.ok) {
+                return { error: 'Erro ao consultar o serviço de CEP (ViaCEP)' };
+            }
+
+            const dados = await resposta.json();
+            if (dados.erro === 'true' || dados.erro == true) {
+                return { error: 'Verifique novamente o cep (Bad request)' };
+            }
+            this.logradouro = String(dados.logradouro);
+            this.bairro = String(dados.bairro);
+            this.localidade = String(dados.localidade);
+            this.uf = String(dados.uf);
+            return null;
+        } catch (err) {
+            // Captura erros de rede (ex: falta de internet)
+            return { error: 'Não foi possível conectar ao serviço de busca' };
+        }
     }
     validarNome() {
-        if (this.nome || this.nome.trim().length === 0) {
+        if (!this.nome || this.nome.trim().length === 0) {
             return { erro: 'O nome é obrigatório.' };
         }
 
@@ -57,23 +70,19 @@ export default class ClienteModel {
     }
 
     validarCPF() {
-        if (!this.cpf || this.cpf.length !== 11 || isNaN(this.cpf))
+        if (!this.cpf || this.cpf.length < 11 || isNaN(this.cpf) || this.cpf.length > 11)
             return { erro: 'CPF deve conter 11 dígitos numéricos.' };
 
         return null;
     }
 
-    validarCEP() {
-        if (!this.cep || this.cep.length !== 8 || isNaN(this.cep))
-            return { erro: 'CEP deve conter exatamente 8 dígitos numéricos.' };
 
-        return null;
-    }
 
     async validarDuplicidade() {
+        let cpf = String(this.cpf);
         const existente = await prisma.cliente.findFirst({
             where: {
-                OR: [{ cpf: this.cpf }, { telefone: this.telefone }],
+                OR: [{ cpf: cpf }, { telefone: this.telefone }],
                 NOT: this.id ? { id: this.id } : undefined,
             },
         });
@@ -94,21 +103,24 @@ export default class ClienteModel {
         let erro = this.validarCPF();
         if (erro) return erro;
 
-        erro = this.validarCEP();
-        if (erro) return erro;
+
 
         erro = await this.validarDuplicidade();
         if (erro) return erro;
 
-        const erroEndereco = await this.buscarEndereco();
+        const cep = parseInt(this.cep)
+        const erroEndereco = await this.buscarEndereco(cep);
         if (erroEndereco) return erroEndereco;
+
+
+        let cpf = String(this.cpf)
         return prisma.cliente.create({
             data: {
                 nome: this.nome,
                 telefone: this.telefone,
                 email: this.email,
-                cpf: this.cpf,
-                cep: this.cep,
+                cpf: cpf,
+                cep: String(this.cep),
                 logradouro: this.logradouro,
                 bairro: this.bairro,
                 localidade: this.localidade,
@@ -128,7 +140,7 @@ export default class ClienteModel {
         erro = this.validarCEP();
         if (erro) return erro;
 
-        erro = await this.validarDuplicidade();
+        erro = this.validarDuplicidade();
         if (erro) return erro;
 
         return prisma.cliente.update({
