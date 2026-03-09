@@ -30,7 +30,7 @@ export default class ClienteModel {
     // converter o cep para int
     async buscarEndereco(cep) {
         let ce = String(cep).replace(/\D/g, '');
-        if (ce.length !== 9) {
+        if (ce.length !== 8) {
             return { error: 'Formato de CEP inválido (deve ter 9 dígitos)' };
         }
 
