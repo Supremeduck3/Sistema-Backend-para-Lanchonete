@@ -21,12 +21,13 @@ export const criar = async (req, res) => {
         if (data && data.erro) {
             return res.status(400).json({ error: data.erro });
         }
-        
+
         return res.status(201).json({ message: 'Registro criado com sucesso!', data });
     } catch (error) {
         console.error('Erro ao criar:', error);
         return res.status(500).json({ error: 'Erro interno ao salvar o registro.' });
     }
+
 };
 
 export const buscarTodos = async (req, res) => {
@@ -125,11 +126,12 @@ export const deletar = async (req, res) => {
     }
 };
 
+
 class ClienteController {
     static async climaCliente(req, res) {
         const { id } = req.params;
 
-        const cliente = await ClienteModel.buscarPorId(id);
+        const cliente = await clienteModel.buscarPorId(id);
 
         if (!cliente) {
             return res.status(404).json({ erro: 'Cliente não encontrado' });

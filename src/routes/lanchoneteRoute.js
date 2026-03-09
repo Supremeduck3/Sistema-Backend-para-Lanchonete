@@ -7,11 +7,11 @@ import autenticar from '../utils/apiKey.js';
 
 const router = express.Router();
 
-router.post('/clientes', autenticar, controller.criar);
-router.get('/clientes', autenticar, controller.buscarTodos);
-router.get('/clientes/:id', autenticar, controller.buscarPorId);
-router.put('/clientes/:id', autenticar, controller.atualizar);
-router.delete('/clientes/:id', autenticar, controller.deletar);
+router.post('/clientes', autenticar1, controller.criar);
+router.get('/clientes', autenticar1, controller.buscarTodos);
+router.get('/clientes/:id', autenticar1, controller.buscarPorId);
+router.put('/clientes/:id', autenticar1, controller.atualizar);
+router.delete('/clientes/:id', autenticar1, controller.deletar);
 
 router.post('/pedidos', controller1.criar);
 router.get('/pedidos', controller1.buscarTodos);
