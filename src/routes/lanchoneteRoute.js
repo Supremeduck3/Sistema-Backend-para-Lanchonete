@@ -1,5 +1,4 @@
 import express from 'express';
-import autenticarApikey from './../utils/apiKey.js'
 import * as controller from '../controllers/clientController.js';
 import * as controller1 from '../controllers/pedidoController.js';
 import * as controller2 from '../controllers/produtoControllers.js';
