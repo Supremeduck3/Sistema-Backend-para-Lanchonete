@@ -50,7 +50,7 @@ enum StatusPedido {
 model Pedido {
     id        Int          @id @default(autoincrement())
     clienteId Int
-    cliente   Cliente      @relation(fields: [clienteId], references: [id])
+    cliente   Cliente      @relation(fields: [clienteId], references: [id], onDelete: Cascade) //quando o cliente for deletado os pedidos dele também serão
     total     Decimal      @db.Decimal(10, 2)
     status    StatusPedido
     criadoEm  DateTime     @default(now())
@@ -67,4 +67,3 @@ model ItemPedido {
 
     @@map("itemPedido")
 }
-
