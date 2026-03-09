@@ -67,3 +67,4 @@ model ItemPedido {
 
     @@map("itemPedido")
 }
+
