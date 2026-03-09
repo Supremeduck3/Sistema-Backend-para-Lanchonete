@@ -123,11 +123,12 @@ export const deletar = async (req, res) => {
     }
 };
 
+
 class ClienteController {
     static async climaCliente(req, res) {
         const { id } = req.params;
 
-        const cliente = await ClienteModel.buscarPorId(id);
+        const cliente = await clienteModel.buscarPorId(id);
 
         if (!cliente) {
             return res.status(404).json({ erro: 'Cliente não encontrado' });
