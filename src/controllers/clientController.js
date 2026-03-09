@@ -1,5 +1,5 @@
 import clienteModel from './../models/clienteModel.js';
-import prisma from '../utils/prisma.js';
+import prisma from '../utils/prismaClient.js';
 import { buscarClimaPorCep } from '../services/climaService.js';
 
 export const criar = async (req, res) => {

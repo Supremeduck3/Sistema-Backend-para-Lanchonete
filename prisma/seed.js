@@ -15,7 +15,7 @@ async function main() {
     await prisma.itemPedido.deleteMany();
     await prisma.pedido.deleteMany();
     await prisma.produto.deleteMany();
-    await prisma.cliente.deleteMany();
+    
 
     const clientesRaw = [
         {

@@ -192,7 +192,7 @@ export default class ClienteModel {
         return prisma.cliente.delete({ where: { id: this.id } });
     }
 
-    async buscarTodos(filtros = {}) {
+    static async buscarTodos(filtros = {}) {
         const where = {};
 
         if (filtros.nome) {
