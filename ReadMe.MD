@@ -1,66 +1,20 @@
-# Sistema Backend para Lanchonete
+# 🏪 Sistema Backend — Lanchonete
+> CRUD completo para lanchonete: clientes, produtos, pedidos e pagamentos.
 
-Um sistema CRUD completo para gerenciamento de uma lanchonete, desenvolvido com Node.js, Express e
-Prisma ORM.
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 
-## 📋 Descrição
+## ✨ Funcionalidades
+- 👤 Clientes (CPF, email, endereço)
+- 🍔 Produtos (Lanche, Bebida, Sobremesa, Combo)
+- 📋 Pedidos com status (ABERTO/PAGO/CANCELADO)
 
-Este projeto implementa um backend RESTful para uma lanchonete, permitindo o gerenciamento de
-clientes, produtos, pedidos e itens de pedido. O sistema inclui validações de negócio e utiliza
-PostgreSQL como banco de dados.
-
-## 🚀 Funcionalidades
-
-- **Gerenciamento de Clientes**: CRUD completo com validações de CPF, telefone e email únicos
-- **Gerenciamento de Produtos**: CRUD com categorias (Lanche, Bebida, Sobremesa, Combo) e controle
-  de disponibilidade
-- **Gerenciamento de Pedidos**: Criação, listagem, pagamento e cancelamento de pedidos
-- **Gerenciamento de Itens de Pedido**: Adição de produtos aos pedidos com validações
-
-## 🛠️ Tecnologias Utilizadas
-
-- **Node.js** - Runtime JavaScript
-- **Express.js** - Framework web
-- **Prisma** - ORM para banco de dados
-- **PostgreSQL** - Banco de dados relacional
-- **Dotenv** - Gerenciamento de variáveis de ambiente
-
-## 🗄️ Modelo de Dados
-
+## 🚀 Como Rodar
+```bash
+git clone https://github.com/Supremeduck3/Sistema-Backend-para-Lanchonete.git
+cd Sistema-Backend-para-Lanchonete && npm install
+npx prisma migrate dev --name init && npm run dev
 ```
-Cliente
-├── id (PK)
-├── nome
-├── telefone (unique)
-├── email (unique, optional)
-├── cpf (unique, optional)
-├── cep
-├── logradouro
-├── bairro
-├── localidade
-├── uf
-└── ativo (default: true)
-
-Produto
-├── id (PK)
-├── nome
-├── descricao
-├── categoria (enum)
-├── preco (decimal 10,2)
-└── disponivel (boolean)
-
-Pedido
-├── id (PK)
-├── clienteId (FK)
-├── total (decimal 10,2)
-├── status (enum: ABERTO, PAGO, CANCELADO)
-└── criadoEm (datetime)
-
-ItemPedido
-├── id (PK)
-├── pedidoId (FK)
-├── produtoId (FK)
-├── quantidade
-└── precoUnitario (decimal 10,2)
-``
-```
+---
+<p align="center">Feito com ❤️ por <a href="https://github.com/Supremeduck3">Supremeduck3</a></p>
